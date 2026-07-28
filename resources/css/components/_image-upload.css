@@ -1,0 +1,145 @@
+/*
+ |----------------------------------------------------------------------
+ | Image upload & gallery
+ |----------------------------------------------------------------------
+ */
+
+.upload {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.upload-dropzone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-8);
+    border: 1.5px dashed var(--border-color-strong);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-gray-25);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.upload-dropzone:hover {
+    border-color: var(--color-brand-400);
+    background-color: var(--color-brand-50);
+}
+
+.upload-dropzone-icon {
+    color: var(--text-muted);
+}
+
+.upload-dropzone-title {
+    font-weight: var(--weight-medium);
+}
+
+.upload-dropzone-hint {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.upload-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.upload-counter {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.upload-counter.is-warning {
+    color: var(--color-warning-text);
+    font-weight: var(--weight-medium);
+}
+
+/* ---- Previews & existing gallery -------------------------------------- */
+
+.upload-previews,
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: var(--space-3);
+}
+
+.upload-previews:empty {
+    display: none;
+}
+
+.upload-preview,
+.image-tile {
+    position: relative;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--surface-sunken);
+}
+
+.upload-preview img,
+.image-tile img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    display: block;
+}
+
+.upload-preview.is-invalid {
+    border-color: var(--color-danger-solid);
+    box-shadow: inset 0 0 0 1px var(--color-danger-solid);
+}
+
+.upload-preview-meta {
+    display: block;
+    padding: var(--space-1) var(--space-2);
+    font-size: 11px;
+    color: var(--text-muted);
+    background-color: var(--surface-card);
+}
+
+.upload-preview.is-invalid .upload-preview-meta {
+    color: var(--color-danger-text);
+}
+
+/* Delete control sits over the image; always visible rather than hover-only,
+   since a hidden destructive control is a control owners never find. */
+.image-tile-remove {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: var(--radius-pill);
+    background-color: rgba(22, 26, 36, 0.72);
+    color: var(--color-white);
+    line-height: 0;
+    transition: background-color var(--transition-fast);
+}
+
+.image-tile-remove:hover {
+    background-color: var(--color-danger-solid);
+}
+
+.image-tile-primary {
+    position: absolute;
+    bottom: var(--space-2);
+    left: var(--space-2);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+    background-color: rgba(22, 26, 36, 0.72);
+    color: var(--color-white);
+    font-size: 10px;
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}

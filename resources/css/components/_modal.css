@@ -1,0 +1,107 @@
+/*
+ |----------------------------------------------------------------------
+ | Modal dialogs
+ |----------------------------------------------------------------------
+ | Built on the native <dialog> element -- it gives us focus trapping,
+ | Escape-to-close and the top layer for free, which is a lot of vanilla
+ | JS we don't have to write or get wrong.
+ |
+ | Note: destructive confirmations use these, never window.confirm().
+ */
+
+.modal {
+    width: 480px;
+    max-width: calc(100vw - var(--space-8));
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    background-color: var(--surface-card);
+    box-shadow: var(--shadow-lg);
+    color: var(--text-primary);
+}
+
+.modal::backdrop {
+    background-color: rgba(22, 26, 36, 0.45);
+}
+
+.modal[open] {
+    animation: modal-in 160ms ease;
+}
+
+@keyframes modal-in {
+    from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-wide   { width: 640px; }
+.modal-narrow { width: 400px; }
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-5) var(--space-3);
+}
+
+.modal-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+}
+
+.modal-subtitle {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+}
+
+.modal-close {
+    flex: 0 0 auto;
+    padding: var(--space-1);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    line-height: 0;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.modal-close:hover {
+    background-color: var(--color-gray-100);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    padding: 0 var(--space-5) var(--space-5);
+}
+
+.modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--border-color);
+    background-color: var(--color-gray-25);
+    border-bottom-left-radius: var(--radius-xl);
+    border-bottom-right-radius: var(--radius-xl);
+}
+
+.modal-footer.is-split {
+    justify-content: space-between;
+}
+
+/* Icon treatment for destructive confirmations. */
+.modal-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+    flex: 0 0 auto;
+    margin-bottom: var(--space-3);
+}
+
+.modal-icon.is-danger  { background-color: var(--color-danger-surface);  color: var(--color-danger-solid); }
+.modal-icon.is-warning { background-color: var(--color-warning-surface); color: var(--color-warning-solid); }
+.modal-icon.is-info    { background-color: var(--color-info-surface);    color: var(--color-info-solid); }

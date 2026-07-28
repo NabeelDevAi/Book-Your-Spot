@@ -1,0 +1,105 @@
+/*
+ |----------------------------------------------------------------------
+ | Application shell & page chrome
+ |----------------------------------------------------------------------
+ */
+
+.app-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.app-main {
+    flex: 1 1 auto;
+    padding-block: var(--space-8);
+}
+
+/* ---- Page header ------------------------------------------------------- */
+
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.page-heading {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    letter-spacing: -0.015em;
+    color: var(--text-primary);
+}
+
+.page-description {
+    margin-top: var(--space-1);
+    font-size: var(--text-base);
+    color: var(--text-muted);
+    max-width: 72ch;
+}
+
+.page-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 0 0 auto;
+}
+
+/* ---- Flash message region ------------------------------------------------ */
+
+.flash-region {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+.flash-region:empty {
+    display: none;
+}
+
+/* ---- Footer --------------------------------------------------------------- */
+
+.app-footer {
+    padding-block: var(--space-6);
+    border-top: 1px solid var(--border-color);
+    background-color: var(--surface-card);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+}
+
+.app-footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+}
+
+.footer-links {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+}
+
+/* ---- Two-column content layout --------------------------------------------- */
+
+.layout-with-aside {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: var(--space-6);
+    align-items: start;
+}
+
+.layout-with-aside-left {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr);
+    gap: var(--space-6);
+    align-items: start;
+}
+
+.aside-sticky {
+    position: sticky;
+    top: calc(var(--topbar-height) + var(--space-6));
+}

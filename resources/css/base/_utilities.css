@@ -1,0 +1,104 @@
+/*
+ |----------------------------------------------------------------------
+ | Layout primitives & small utilities
+ |----------------------------------------------------------------------
+ | A deliberately small set. This is NOT a utility framework -- these are
+ | the handful of composition primitives (stack, cluster, grid, split)
+ | that keep component CSS from re-declaring the same flexbox six times.
+ | Anything visual belongs in a component file, not here.
+ */
+
+/* ---- Container ----------------------------------------------------- */
+
+.container {
+    width: var(--container-width);
+    margin-inline: auto;
+    padding-inline: var(--space-6);
+}
+
+.container-narrow {
+    width: var(--container-narrow);
+    margin-inline: auto;
+    padding-inline: var(--space-6);
+}
+
+/* ---- Stack: vertical rhythm ---------------------------------------- */
+
+.stack       { display: flex; flex-direction: column; gap: var(--space-4); }
+.stack-1     { display: flex; flex-direction: column; gap: var(--space-1); }
+.stack-2     { display: flex; flex-direction: column; gap: var(--space-2); }
+.stack-3     { display: flex; flex-direction: column; gap: var(--space-3); }
+.stack-6     { display: flex; flex-direction: column; gap: var(--space-6); }
+.stack-8     { display: flex; flex-direction: column; gap: var(--space-8); }
+
+/* ---- Cluster: horizontal group that stays on one line -------------- */
+
+.cluster {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.cluster-1 { display: flex; align-items: center; gap: var(--space-1); }
+.cluster-2 { display: flex; align-items: center; gap: var(--space-2); }
+.cluster-4 { display: flex; align-items: center; gap: var(--space-4); }
+.cluster-6 { display: flex; align-items: center; gap: var(--space-6); }
+
+.cluster-start { align-items: flex-start; }
+.cluster-baseline { align-items: baseline; }
+
+/* ---- Split: push last child to the far edge ------------------------ */
+
+.split {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.split-start { align-items: flex-start; }
+
+/* ---- Grid ----------------------------------------------------------- */
+
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
+
+.grid-gap-6 { gap: var(--space-6); }
+
+/* ---- Sizing & flow -------------------------------------------------- */
+
+.flex-1     { flex: 1 1 auto; min-width: 0; }
+.flex-none  { flex: 0 0 auto; }
+.w-full     { width: 100%; }
+.ml-auto    { margin-left: auto; }
+.mt-auto    { margin-top: auto; }
+.text-right { text-align: right; }
+.text-center{ text-align: center; }
+
+/* ---- Section spacing ------------------------------------------------ */
+
+.section    { padding-block: var(--space-10); }
+.section-sm { padding-block: var(--space-6); }
+
+/* ---- Divider --------------------------------------------------------- */
+
+.divider {
+    height: 1px;
+    background-color: var(--border-color);
+    border: 0;
+}
+
+/* ---- Screen-reader only ---------------------------------------------- */
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}

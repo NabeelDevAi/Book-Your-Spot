@@ -1,0 +1,148 @@
+/*
+ |----------------------------------------------------------------------
+ | Buttons
+ |----------------------------------------------------------------------
+ | .btn is the base; a variant class sets the colours and a size class
+ | adjusts the box. Owner-facing actions (approve / reject) get their own
+ | variants because NFR-5 wants those decisions readable at a glance.
+ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-weight: var(--weight-medium);
+    line-height: 1.25;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color var(--transition-fast),
+                border-color var(--transition-fast),
+                color var(--transition-fast),
+                box-shadow var(--transition-fast);
+}
+
+.btn:focus-visible {
+    outline: none;
+    box-shadow: var(--shadow-focus);
+}
+
+.btn:disabled,
+.btn.is-disabled {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+/* ---- Variants -------------------------------------------------------- */
+
+.btn-primary {
+    background-color: var(--color-brand-600);
+    border-color: var(--color-brand-600);
+    color: var(--text-inverse);
+}
+.btn-primary:hover {
+    background-color: var(--color-brand-700);
+    border-color: var(--color-brand-700);
+}
+
+.btn-secondary {
+    background-color: var(--surface-card);
+    border-color: var(--border-color-strong);
+    color: var(--text-primary);
+}
+.btn-secondary:hover {
+    background-color: var(--color-gray-50);
+    border-color: var(--color-gray-400);
+}
+
+.btn-ghost {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--text-secondary);
+}
+.btn-ghost:hover {
+    background-color: var(--color-gray-100);
+    color: var(--text-primary);
+}
+
+.btn-danger {
+    background-color: var(--color-danger-solid);
+    border-color: var(--color-danger-solid);
+    color: var(--text-inverse);
+}
+.btn-danger:hover {
+    background-color: #b42318;
+    border-color: #b42318;
+}
+
+.btn-danger-outline {
+    background-color: var(--surface-card);
+    border-color: var(--color-danger-border);
+    color: var(--color-danger-text);
+}
+.btn-danger-outline:hover {
+    background-color: var(--color-danger-surface);
+}
+
+.btn-success {
+    background-color: var(--color-success-solid);
+    border-color: var(--color-success-solid);
+    color: var(--text-inverse);
+}
+.btn-success:hover {
+    background-color: #0f7a47;
+    border-color: #0f7a47;
+}
+
+.btn-accent {
+    background-color: var(--color-accent-500);
+    border-color: var(--color-accent-500);
+    color: var(--color-gray-900);
+}
+.btn-accent:hover {
+    background-color: var(--color-accent-600);
+    border-color: var(--color-accent-600);
+    color: var(--text-inverse);
+}
+
+/* ---- Sizes ------------------------------------------------------------ */
+
+.btn-sm {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-md);
+}
+
+.btn-block {
+    display: flex;
+    width: 100%;
+}
+
+/* ---- Icon-only --------------------------------------------------------- */
+
+.btn-icon {
+    padding: var(--space-2);
+    line-height: 0;
+}
+
+.btn-icon.btn-sm {
+    padding: var(--space-1);
+}
+
+/* ---- Button group ------------------------------------------------------- */
+
+.btn-group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
