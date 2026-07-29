@@ -29,7 +29,7 @@
         </div>
     </form>
 
-    <div class="stat-row">
+    <div class="stat-row" data-reveal-group>
         <x-ui.stat
             label="Reservations"
             :value="number_format($headline['total_reservations'])"
@@ -82,9 +82,9 @@
                     'completed' => 'var(--color-info-solid)',
                     'pending' => 'var(--color-warning-solid)',
                     'rejected' => 'var(--color-danger-solid)',
-                    'no_show' => '#8b1c4d',
-                    'expired' => 'var(--color-gray-400)',
-                    'cancelled' => 'var(--color-gray-300)',
+                    'no_show' => 'var(--color-magenta-500)',
+                    'expired' => 'var(--color-ink-500)',
+                    'cancelled' => 'var(--color-ink-400)',
                 ];
             @endphp
 

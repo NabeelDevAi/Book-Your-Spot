@@ -26,7 +26,7 @@
     @else
         {{-- Decisions owed lead, because that is what an owner opens this page
              to deal with (FR-2.6, NFR-5). --}}
-        <div class="stat-row">
+        <div class="stat-row" data-reveal-group>
             <x-ui.stat
                 label="Awaiting your decision"
                 :value="$pendingCount"

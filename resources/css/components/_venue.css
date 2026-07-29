@@ -7,30 +7,105 @@
 /* ---- Search hero ------------------------------------------------------ */
 
 .search-hero {
-    padding: var(--space-10) 0 var(--space-8);
-    background: linear-gradient(165deg, var(--color-brand-700) 0%, var(--color-brand-900) 100%);
-    color: var(--text-inverse);
-    margin-bottom: var(--space-8);
+    padding: var(--space-16) 0 var(--space-10);
+    background: var(--color-ink-950);
+    color: var(--text-primary);
+    margin-bottom: var(--space-10);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Two soft glows -- the same lime/orange pairing used on the auth panel,
+   the one place in the marketplace allowed to feel this loud. */
+.search-hero::before {
+    content: "";
+    position: absolute;
+    width: 620px;
+    height: 620px;
+    left: -220px;
+    top: -320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(198, 255, 62, 0.14) 0%, rgba(198, 255, 62, 0) 70%);
+    pointer-events: none;
+}
+
+.search-hero::after {
+    content: "";
+    position: absolute;
+    width: 520px;
+    height: 520px;
+    right: -180px;
+    bottom: -320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 90, 54, 0.16) 0%, rgba(255, 90, 54, 0) 70%);
+    pointer-events: none;
+}
+
+.search-hero > .container {
+    position: relative;
+    z-index: 1;
 }
 
 .search-hero-title {
-    font-size: var(--text-3xl);
-    font-weight: var(--weight-bold);
-    letter-spacing: -0.02em;
-    line-height: 1.2;
+    font-family: var(--font-display);
+    font-size: var(--text-6xl);
+    font-weight: var(--weight-extrabold);
+    letter-spacing: -0.035em;
+    line-height: 1;
+    max-width: 14ch;
 }
 
 .search-hero-subtitle {
-    margin-top: var(--space-2);
-    color: rgba(255, 255, 255, 0.75);
-    font-size: var(--text-md);
+    margin-top: var(--space-3);
+    color: var(--color-ink-200);
+    font-size: var(--text-lg);
+    max-width: 52ch;
+}
+
+/* ---- Category chips (extensible: label-only, works for any future
+   venue category -- sport, hall, event space -- with zero new markup) --- */
+
+.category-chips {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-top: var(--space-6);
+}
+
+.category-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-color-strong);
+    background-color: rgba(244, 245, 240, 0.04);
+    color: var(--color-ink-100);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    white-space: nowrap;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast),
+                color var(--transition-fast), transform var(--transition-fast);
+}
+
+.category-chip:hover {
+    border-color: var(--color-ink-300);
+    background-color: rgba(244, 245, 240, 0.08);
+    transform: translateY(-1px);
+}
+
+.category-chip.is-active {
+    background-color: var(--color-accent-primary);
+    border-color: var(--color-accent-primary);
+    color: var(--text-on-accent);
 }
 
 /* The filter panel sits on the hero, half-overlapping the content below. */
 .search-panel {
     margin-top: var(--space-6);
     padding: var(--space-4);
-    background-color: var(--surface-card);
+    background-color: var(--surface-elevated);
+    border: 1px solid var(--border-color-strong);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
 }
@@ -46,7 +121,7 @@
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
     gap: var(--space-3);
-    align-items: end;
+    /* align-items: end; */
     margin-top: var(--space-3);
     padding-top: var(--space-3);
     border-top: 1px solid var(--border-color);
@@ -75,8 +150,8 @@
     gap: var(--space-1);
     padding: 3px var(--space-2);
     border-radius: var(--radius-pill);
-    background-color: var(--color-brand-50);
-    color: var(--color-brand-700);
+    background-color: rgba(198, 255, 62, 0.1);
+    color: var(--color-lime-300);
     font-size: var(--text-xs);
     font-weight: var(--weight-medium);
 }
@@ -111,37 +186,43 @@
 }
 
 .venue-card:hover {
-    border-color: var(--color-brand-300);
+    border-color: var(--color-ink-400);
     box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+}
+
+.venue-card:hover .venue-card-media img {
+    transform: scale(1.05);
 }
 
 .venue-card-media {
     position: relative;
-    height: 160px;
+    height: 168px;
     background-color: var(--surface-sunken);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-gray-400);
+    color: var(--color-ink-500);
+    overflow: hidden;
 }
 
 .venue-card-media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform var(--transition-slow) var(--ease-out);
 }
 
 .venue-card-price {
     position: absolute;
     bottom: var(--space-2);
     right: var(--space-2);
-    padding: 3px var(--space-2);
+    padding: 4px var(--space-2);
     border-radius: var(--radius-sm);
-    background-color: rgba(22, 26, 36, 0.82);
-    color: var(--color-white);
+    background-color: var(--color-accent-primary);
+    color: var(--text-on-accent);
     font-size: var(--text-xs);
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-bold);
 }
 
 .venue-card-body {
@@ -153,6 +234,7 @@
 }
 
 .venue-card-name {
+    font-family: var(--font-display);
     font-size: var(--text-md);
     font-weight: var(--weight-semibold);
     color: var(--text-primary);
@@ -182,7 +264,7 @@
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
     border-top: 1px solid var(--border-color);
-    background-color: var(--color-gray-25);
+    background-color: var(--surface-sunken);
 }
 
 /* ---- Venue detail ------------------------------------------------------- */
@@ -230,6 +312,11 @@
     border-radius: var(--radius-lg);
     background-color: var(--surface-card);
     align-items: center;
+    transition: border-color var(--transition-base);
+}
+
+.spot-row:hover {
+    border-color: var(--color-ink-400);
 }
 
 .spot-row + .spot-row {
@@ -237,7 +324,7 @@
 }
 
 .spot-row.is-full {
-    background-color: var(--color-gray-25);
+    background-color: var(--surface-sunken);
 }
 
 .spot-row-name {
@@ -305,18 +392,19 @@
     border-radius: var(--radius-md);
     background-color: var(--surface-card);
     flex: 0 0 auto;
-    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+    transition: border-color var(--transition-fast), background-color var(--transition-fast),
+                transform var(--transition-fast);
 }
 
 .date-chip:hover {
-    border-color: var(--color-brand-400);
-    background-color: var(--color-brand-50);
+    border-color: var(--color-ink-300);
+    transform: translateY(-1px);
 }
 
 .date-chip.is-active {
-    border-color: var(--color-brand-600);
-    background-color: var(--color-brand-600);
-    color: var(--text-inverse);
+    border-color: var(--color-accent-primary);
+    background-color: var(--color-accent-primary);
+    color: var(--text-on-accent);
 }
 
 .date-chip-day {
@@ -327,7 +415,7 @@
 }
 
 .date-chip.is-active .date-chip-day {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(13, 15, 18, 0.7);
 }
 
 .date-chip-date {
@@ -341,6 +429,12 @@
     display: grid;
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: var(--space-2);
+    transition: opacity var(--transition-fast);
+}
+
+.slot-grid[aria-busy="true"] {
+    opacity: 0.45;
+    pointer-events: none;
 }
 
 .slot {
@@ -355,12 +449,14 @@
     cursor: pointer;
     font-size: var(--text-sm);
     font-variant-numeric: tabular-nums;
-    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+    transition: border-color var(--transition-fast), background-color var(--transition-fast),
+                transform var(--transition-fast);
+    animation: pop-in var(--transition-base) var(--ease-out) backwards;
 }
 
 .slot:hover {
-    border-color: var(--color-brand-400);
-    background-color: var(--color-brand-50);
+    border-color: var(--color-ink-300);
+    transform: translateY(-1px);
 }
 
 .slot input {
@@ -370,10 +466,11 @@
 }
 
 .slot:has(input:checked) {
-    border-color: var(--color-brand-600);
-    background-color: var(--color-brand-600);
-    color: var(--text-inverse);
+    border-color: var(--color-accent-primary);
+    background-color: var(--color-accent-primary);
+    color: var(--text-on-accent);
     font-weight: var(--weight-semibold);
+    animation: pulse-ring var(--transition-slow) var(--ease-out);
 }
 
 .slot-end {
@@ -382,7 +479,7 @@
 }
 
 .slot:has(input:checked) .slot-end {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(13, 15, 18, 0.7);
 }
 
 /* ---- Booking summary panel ------------------------------------------------------ */
@@ -420,9 +517,11 @@
 }
 
 .booking-total-value {
+    font-family: var(--font-display);
     font-size: var(--text-2xl);
     font-weight: var(--weight-bold);
     letter-spacing: -0.02em;
+    color: var(--color-accent-primary);
 }
 
 .booking-total-note {
@@ -444,4 +543,5 @@
     font-size: var(--text-xl);
     font-weight: var(--weight-bold);
     letter-spacing: 0.08em;
+    color: var(--color-accent-primary);
 }

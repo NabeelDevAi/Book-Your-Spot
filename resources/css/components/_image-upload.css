@@ -19,15 +19,15 @@
     padding: var(--space-8);
     border: 1.5px dashed var(--border-color-strong);
     border-radius: var(--radius-lg);
-    background-color: var(--color-gray-25);
+    background-color: var(--surface-sunken);
     text-align: center;
     cursor: pointer;
     transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .upload-dropzone:hover {
-    border-color: var(--color-brand-400);
-    background-color: var(--color-brand-50);
+    border-color: var(--color-accent-primary);
+    background-color: rgba(198, 255, 62, 0.05);
 }
 
 .upload-dropzone-icon {
@@ -120,8 +120,8 @@
     width: 26px;
     height: 26px;
     border-radius: var(--radius-pill);
-    background-color: rgba(22, 26, 36, 0.72);
-    color: var(--color-white);
+    background-color: rgba(8, 9, 11, 0.78);
+    color: var(--color-ink-0);
     line-height: 0;
     transition: background-color var(--transition-fast);
 }
@@ -136,10 +136,10 @@
     left: var(--space-2);
     padding: 2px var(--space-2);
     border-radius: var(--radius-sm);
-    background-color: rgba(22, 26, 36, 0.72);
-    color: var(--color-white);
+    background-color: var(--color-accent-primary);
+    color: var(--text-on-accent);
     font-size: 10px;
-    font-weight: var(--weight-semibold);
+    font-weight: var(--weight-bold);
     text-transform: uppercase;
     letter-spacing: 0.06em;
 }

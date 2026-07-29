@@ -13,6 +13,7 @@ import { initHoursEditor } from './hours-editor';
 import { initImageUpload } from './image-upload';
 import { initBookingForm } from './booking-form';
 import { initNotifications } from './notifications';
+import { initScrollReveal } from './scroll-reveal';
 
 function boot() {
     initDropdowns();
@@ -23,6 +24,7 @@ function boot() {
     initImageUpload();
     initBookingForm();
     initNotifications();
+    initScrollReveal();
 }
 
 if (document.readyState === 'loading') {

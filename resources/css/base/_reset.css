@@ -101,6 +101,6 @@ hr {
 /* Consistent, visible focus for keyboard users without the default
    browser ring on mouse interaction. */
 :focus-visible {
-    outline: 2px solid var(--color-brand-500);
+    outline: 2px solid var(--color-accent-primary);
     outline-offset: 2px;
 }

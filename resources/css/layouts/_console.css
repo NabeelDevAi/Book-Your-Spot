@@ -5,12 +5,14 @@
  | Persistent left sidebar + scrollable content well. The Owner console is
  | the screen this audience uses every day, so navigation stays fixed and
  | the daily work (today's bookings, pending requests) is always one click
- | away (NFR-5).
+ | away (NFR-5). Same brand as the marketplace, quieter delivery -- see
+ | the `.console-shell` token overrides in base/_tokens.css.
  */
 
 .console-shell {
     display: flex;
     min-height: 100vh;
+    background-color: var(--surface-page);
 }
 
 .console-sidebar {
@@ -85,8 +87,8 @@
 }
 
 .business-switcher:hover {
-    border-color: var(--color-gray-400);
-    background-color: var(--color-gray-50);
+    border-color: var(--color-ink-400);
+    background-color: var(--surface-elevated);
 }
 
 .business-switcher-name {

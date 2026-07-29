@@ -12,7 +12,7 @@
     <x-ui.card>
         <div class="stack-3">
             <div class="cluster-2">
-                <span class="auth-point-icon" style="background: var(--color-brand-50); color: var(--color-brand-600);">
+                <span class="auth-point-icon" >
                     <x-ui.icon name="phone" :size="16" />
                 </span>
                 <div>
@@ -22,7 +22,7 @@
             </div>
 
             <div class="cluster-2">
-                <span class="auth-point-icon" style="background: var(--color-brand-50); color: var(--color-brand-600);">
+                <span class="auth-point-icon" >
                     <x-ui.icon name="lock" :size="16" />
                 </span>
                 <div>

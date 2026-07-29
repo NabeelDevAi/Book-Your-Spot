@@ -11,7 +11,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-1);
-    padding: 2px var(--space-2);
+    padding: 3px var(--space-2);
     border: 1px solid transparent;
     border-radius: var(--radius-sm);
     font-size: var(--text-xs);
@@ -75,7 +75,7 @@
 .badge-status-rejected   { background-color: var(--color-danger-surface);  border-color: var(--color-danger-border);  color: var(--color-danger-text); }
 .badge-status-expired    { background-color: var(--color-neutral-surface); border-color: var(--color-neutral-border); color: var(--color-neutral-text); }
 .badge-status-cancelled  { background-color: var(--color-neutral-surface); border-color: var(--color-neutral-border); color: var(--color-neutral-text); }
-.badge-status-no_show    { background-color: #fbe8f0; border-color: #f0b6ce; color: #8b1c4d; }
+.badge-status-no_show    { background-color: rgba(255, 62, 136, 0.14); border-color: rgba(255, 62, 136, 0.36); color: var(--color-magenta-400); }
 
 /* ---- Business statuses ---------------------------------------------------- */
 
@@ -94,15 +94,15 @@
     height: 18px;
     padding-inline: 5px;
     border-radius: var(--radius-pill);
-    background-color: var(--color-danger-solid);
-    color: var(--text-inverse);
+    background-color: var(--color-accent-secondary);
+    color: var(--color-ink-0);
     font-size: 11px;
     font-weight: var(--weight-bold);
     line-height: 1;
 }
 
 .counter-neutral {
-    background-color: var(--color-gray-400);
+    background-color: var(--color-ink-500);
 }
 
 /* ---- Tag (game categories, areas) ------------------------------------------ */
@@ -113,8 +113,9 @@
     gap: var(--space-1);
     padding: 3px var(--space-2);
     border-radius: var(--radius-pill);
-    background-color: var(--color-brand-50);
-    color: var(--color-brand-700);
+    background-color: rgba(198, 255, 62, 0.1);
+    border: 1px solid rgba(198, 255, 62, 0.22);
+    color: var(--color-lime-300);
     font-size: var(--text-xs);
     font-weight: var(--weight-medium);
     white-space: nowrap;
@@ -122,5 +123,6 @@
 
 .tag-muted {
     background-color: var(--surface-sunken);
+    border: 1px solid var(--border-color);
     color: var(--text-secondary);
 }

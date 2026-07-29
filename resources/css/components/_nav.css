@@ -26,6 +26,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
+    font-family: var(--font-display);
     font-size: var(--text-lg);
     font-weight: var(--weight-bold);
     letter-spacing: -0.02em;
@@ -37,17 +38,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border-radius: var(--radius-md);
-    background-color: var(--color-brand-600);
-    color: var(--text-inverse);
+    background-color: var(--color-accent-primary);
+    color: var(--color-ink-950);
+    font-family: var(--font-display);
     font-size: var(--text-base);
-    font-weight: var(--weight-bold);
+    font-weight: var(--weight-extrabold);
 }
 
-.brand-mark.is-admin { background-color: var(--color-gray-800); }
-.brand-mark.is-owner { background-color: var(--color-accent-500); color: var(--color-gray-900); }
+.brand-mark.is-admin { background-color: var(--color-ink-600); color: var(--text-primary); }
+.brand-mark.is-owner { background-color: var(--color-accent-secondary); color: var(--color-ink-0); }
 
 .topbar-nav {
     display: flex;
@@ -68,13 +70,13 @@
 }
 
 .nav-link:hover {
-    background-color: var(--color-gray-100);
+    background-color: var(--surface-elevated);
     color: var(--text-primary);
 }
 
 .nav-link.is-active {
-    background-color: var(--color-brand-50);
-    color: var(--color-brand-700);
+    background-color: rgba(198, 255, 62, 0.1);
+    color: var(--color-accent-primary);
 }
 
 /* ---- Dropdown (vanilla JS, no Alpine) ------------------------------------ */
@@ -89,25 +91,26 @@
     top: calc(100% + var(--space-2));
     min-width: 200px;
     padding: var(--space-1);
-    background-color: var(--surface-card);
-    border: 1px solid var(--border-color);
+    background-color: var(--surface-elevated);
+    border: 1px solid var(--border-color-strong);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     z-index: var(--z-dropdown);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-4px);
+    transform: translateY(-6px) scale(0.98);
+    transform-origin: top right;
     transition: opacity var(--transition-fast), transform var(--transition-fast),
                 visibility var(--transition-fast);
 }
 
 .dropdown-menu.align-end   { right: 0; }
-.dropdown-menu.align-start { left: 0; }
+.dropdown-menu.align-start { left: 0; transform-origin: top left; }
 
 .dropdown.is-open > .dropdown-menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
 }
 
 .dropdown-item {
@@ -124,7 +127,7 @@
 }
 
 .dropdown-item:hover {
-    background-color: var(--color-gray-100);
+    background-color: var(--surface-card);
     color: var(--text-primary);
 }
 
@@ -163,7 +166,7 @@
 }
 
 .user-button:hover {
-    background-color: var(--color-gray-100);
+    background-color: var(--surface-elevated);
 }
 
 .avatar {
@@ -173,8 +176,8 @@
     width: 30px;
     height: 30px;
     border-radius: var(--radius-pill);
-    background-color: var(--color-brand-100);
-    color: var(--color-brand-700);
+    background-color: rgba(198, 255, 62, 0.16);
+    color: var(--color-lime-300);
     font-size: var(--text-sm);
     font-weight: var(--weight-semibold);
     flex: 0 0 auto;
@@ -219,13 +222,13 @@
 }
 
 .sidebar-link:hover {
-    background-color: var(--color-gray-100);
+    background-color: var(--surface-elevated);
     color: var(--text-primary);
 }
 
 .sidebar-link.is-active {
-    background-color: var(--color-brand-50);
-    color: var(--color-brand-700);
+    background-color: rgba(198, 255, 62, 0.1);
+    color: var(--color-accent-primary);
 }
 
 .sidebar-link .counter {
@@ -256,8 +259,8 @@
 }
 
 .tab.is-active {
-    color: var(--color-brand-600);
-    border-bottom-color: var(--color-brand-600);
+    color: var(--color-accent-primary);
+    border-bottom-color: var(--color-accent-primary);
 }
 
 .tab .counter {
@@ -279,5 +282,5 @@
 }
 
 .breadcrumb-sep {
-    color: var(--color-gray-300);
+    color: var(--color-ink-500);
 }

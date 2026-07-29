@@ -18,7 +18,7 @@
 
 .table thead th {
     padding: var(--space-3) var(--space-4);
-    background-color: var(--color-gray-50);
+    background-color: var(--surface-sunken);
     border-bottom: 1px solid var(--border-color);
     font-size: var(--text-xs);
     font-weight: var(--weight-semibold);
@@ -44,14 +44,14 @@
 }
 
 .table tbody tr:hover {
-    background-color: var(--color-gray-25);
+    background-color: var(--surface-sunken);
 }
 
 /* A row that needs the operator's attention (open conflict, flagged
    duplicate) gets a left rule rather than a full background wash, so it
    reads as urgent without fighting the status badges in the row. */
 .table tbody tr.is-attention td:first-child {
-    box-shadow: inset 3px 0 0 var(--color-accent-500);
+    box-shadow: inset 3px 0 0 var(--color-accent-secondary);
 }
 
 .table tbody tr.is-danger td:first-child {
@@ -105,7 +105,7 @@
 }
 
 .table th .sort-link.is-active {
-    color: var(--color-brand-600);
+    color: var(--color-accent-primary);
 }
 
 /* ---- Compact variant -------------------------------------------------------- */

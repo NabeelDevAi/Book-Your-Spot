@@ -43,19 +43,19 @@
 }
 
 .page-link:hover {
-    background-color: var(--color-gray-50);
-    border-color: var(--color-gray-400);
+    background-color: var(--surface-elevated);
+    border-color: var(--color-ink-400);
     color: var(--text-primary);
 }
 
 .page-link.is-active {
-    background-color: var(--color-brand-600);
-    border-color: var(--color-brand-600);
-    color: var(--text-inverse);
+    background-color: var(--color-accent-primary);
+    border-color: var(--color-accent-primary);
+    color: var(--text-on-accent);
 }
 
 .page-link.is-disabled {
-    opacity: 0.45;
+    opacity: 0.4;
     pointer-events: none;
 }
 

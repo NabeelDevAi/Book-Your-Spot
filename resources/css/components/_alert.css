@@ -100,17 +100,17 @@
 
 .toast {
     box-shadow: var(--shadow-lg);
-    background-color: var(--surface-card);
-    animation: toast-in 200ms ease;
+    background-color: var(--surface-elevated);
+    animation: toast-in var(--transition-slow) var(--ease-spring);
 }
 
 @keyframes toast-in {
-    from { opacity: 0; transform: translateX(12px); }
-    to   { opacity: 1; transform: translateX(0); }
+    from { opacity: 0; transform: translateX(24px) scale(0.98); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 .toast.is-leaving {
     opacity: 0;
-    transform: translateX(12px);
+    transform: translateX(24px);
     transition: opacity var(--transition-base), transform var(--transition-base);
 }

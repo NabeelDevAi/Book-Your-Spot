@@ -11,7 +11,7 @@
     </x-ui.page-header>
 
     {{-- Queues first: this page answers "what is waiting on me?" --}}
-    <div class="stat-row">
+    <div class="stat-row" data-reveal-group>
         <x-ui.stat
             label="Venues awaiting review"
             :value="$pendingBusinesses"
@@ -41,7 +41,7 @@
         />
     </div>
 
-    <div class="stat-row">
+    <div class="stat-row" data-reveal-group>
         <x-ui.stat label="Reservations" :value="number_format($headline['total_reservations'])" meta="All time" />
         <x-ui.stat label="Request to booking" :value="$headline['conversion_rate'].'%'" meta="Reached confirmed" />
         <x-ui.stat label="Booked today" :value="$todaysReservations" meta="Pending or confirmed" />

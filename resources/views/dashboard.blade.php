@@ -8,7 +8,7 @@
         description="Your bookings and account activity will appear here."
     />
 
-    <div class="stat-row">
+    <div class="stat-row" data-reveal-group>
         <x-ui.stat label="Upcoming bookings" value="0" meta="Nothing scheduled yet" />
         <x-ui.stat label="Awaiting confirmation" value="0" meta="No pending requests" tone="attention" />
         <x-ui.stat label="Completed" value="0" meta="All time" />

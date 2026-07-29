@@ -3,7 +3,7 @@
     $cover = $business->images->first();
 @endphp
 
-<a href="{{ route('businesses.show', $business) }}" class="venue-card">
+<a href="{{ route('businesses.show', $business) }}" class="venue-card" @if ($reveal ?? false) data-reveal @endif>
     <div class="venue-card-media">
         @if ($cover)
             <img src="{{ $cover->url() }}" alt="{{ $business->name }}" loading="lazy">

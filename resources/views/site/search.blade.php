@@ -6,12 +6,29 @@
 
     <div class="search-hero" style="margin-left: calc(50% - 50vw); margin-right: calc(50% - 50vw); padding-inline: calc(50vw - 50%);">
         <div class="container" style="padding-inline: 0;">
-            <h1 class="search-hero-title">Find a spot to play</h1>
-            <p class="search-hero-subtitle">
-                Snooker, futsal, padel, PS5 and more across Karachi — real prices, live availability.
+            <span class="eyebrow" data-reveal>Karachi &middot; {{ $businesses->total() }} {{ Str::plural('venue', $businesses->total()) }} live</span>
+            <h1 class="search-hero-title" data-reveal>Find a spot,<br>lock it in.</h1>
+            <p class="search-hero-subtitle" data-reveal>
+                Snooker, futsal, padel, PS5 and more across Karachi — real prices, live availability, no back-and-forth.
             </p>
 
-            <form method="GET" action="{{ route('home') }}" class="search-panel">
+            @if ($games->isNotEmpty())
+                <nav class="category-chips" aria-label="Browse by category" data-reveal>
+                    <a href="{{ route('home') }}" class="category-chip @if (blank($filters['game'] ?? null)) is-active @endif">
+                        All venues
+                    </a>
+                    @foreach ($games as $game)
+                        <a
+                            href="{{ request()->fullUrlWithQuery(['game' => $game->slug]) }}"
+                            class="category-chip @if (($filters['game'] ?? null) === $game->slug) is-active @endif"
+                        >
+                            {{ $game->name }}
+                        </a>
+                    @endforeach
+                </nav>
+            @endif
+
+            <form method="GET" action="{{ route('home') }}" class="search-panel" data-reveal>
                 <div class="search-row">
                     <x-ui.field label="Search" name="q">
                         <x-ui.input name="q" :value="$filters['q'] ?? null" placeholder="Venue name or area" />
@@ -136,9 +153,9 @@
             </x-ui.empty-state>
         </x-ui.card>
     @else
-        <div class="venue-grid">
+        <div class="venue-grid" data-reveal-group>
             @foreach ($businesses as $business)
-                @include('site.partials.venue-card', ['business' => $business])
+                @include('site.partials.venue-card', ['business' => $business, 'reveal' => true])
             @endforeach
         </div>
 

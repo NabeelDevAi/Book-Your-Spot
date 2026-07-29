@@ -21,6 +21,7 @@
 }
 
 .card-title {
+    font-family: var(--font-display);
     font-size: var(--text-md);
     font-weight: var(--weight-semibold);
     color: var(--text-primary);
@@ -43,7 +44,7 @@
 .card-footer {
     padding: var(--space-4) var(--space-5);
     border-top: 1px solid var(--border-color);
-    background-color: var(--color-gray-25);
+    background-color: var(--surface-sunken);
     border-bottom-left-radius: var(--radius-lg);
     border-bottom-right-radius: var(--radius-lg);
 }
@@ -57,9 +58,9 @@
 }
 
 .card-link:hover {
-    border-color: var(--color-brand-300);
+    border-color: var(--color-ink-400);
     box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 /* ---- Stat tile (dashboards) -------------------------------------------- */
@@ -72,6 +73,12 @@
     background-color: var(--surface-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
+    transition: border-color var(--transition-base), transform var(--transition-base);
+}
+
+.stat:hover {
+    border-color: var(--color-ink-400);
+    transform: translateY(-2px);
 }
 
 .stat-label {
@@ -83,11 +90,13 @@
 }
 
 .stat-value {
+    font-family: var(--font-display);
     font-size: var(--text-3xl);
     font-weight: var(--weight-bold);
     line-height: 1.1;
     color: var(--text-primary);
     letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
 }
 
 .stat-meta {
@@ -98,11 +107,11 @@
 /* Accent bar so an "action needed" tile reads differently from an
    informational one at a glance. */
 .stat.is-attention {
-    border-left: 3px solid var(--color-accent-500);
+    border-left: 3px solid var(--color-accent-secondary);
 }
 
 .stat.is-attention .stat-value {
-    color: var(--color-accent-600);
+    color: var(--color-accent-secondary);
 }
 
 .stat.is-danger {
@@ -114,7 +123,9 @@
 }
 
 /* ---- Empty state --------------------------------------------------------- */
-/* SRS 9.16 requires an explicit, helpful empty state -- never a blank page. */
+/* SRS 9.16 requires an explicit, helpful empty state -- never a blank page.
+   A soft lime ring behind the icon gives it a designed-moment feel without
+   commissioning bespoke illustration assets. */
 
 .empty-state {
     display: flex;
@@ -130,14 +141,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
     border-radius: var(--radius-pill);
-    background-color: var(--surface-sunken);
-    color: var(--text-muted);
+    background:
+        radial-gradient(circle at 50% 40%, rgba(198, 255, 62, 0.16), transparent 70%),
+        var(--surface-sunken);
+    box-shadow: inset 0 0 0 1px var(--border-color-strong);
+    color: var(--color-accent-primary);
 }
 
 .empty-state-title {
+    font-family: var(--font-display);
     font-size: var(--text-lg);
     font-weight: var(--weight-semibold);
     color: var(--text-primary);

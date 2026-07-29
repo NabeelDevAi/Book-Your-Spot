@@ -5,6 +5,10 @@
  | .btn is the base; a variant class sets the colours and a size class
  | adjusts the box. Owner-facing actions (approve / reject) get their own
  | variants because NFR-5 wants those decisions readable at a glance.
+ |
+ | Every button gets the same tactile feedback: a small lift on hover, a
+ | compress on press. Primary additionally picks up a lime glow -- the
+ | product's one unmistakable "go" signal, used nowhere else.
  */
 
 .btn {
@@ -16,7 +20,7 @@
     border: 1px solid transparent;
     border-radius: var(--radius-md);
     font-size: var(--text-base);
-    font-weight: var(--weight-medium);
+    font-weight: var(--weight-semibold);
     line-height: 1.25;
     white-space: nowrap;
     cursor: pointer;
@@ -24,7 +28,17 @@
     transition: background-color var(--transition-fast),
                 border-color var(--transition-fast),
                 color var(--transition-fast),
-                box-shadow var(--transition-fast);
+                box-shadow var(--transition-base),
+                transform var(--transition-fast);
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0) scale(0.97);
+    transition-duration: 80ms;
 }
 
 .btn:focus-visible {
@@ -34,30 +48,36 @@
 
 .btn:disabled,
 .btn.is-disabled {
-    opacity: 0.55;
+    opacity: 0.45;
     pointer-events: none;
+    transform: none;
 }
 
 /* ---- Variants -------------------------------------------------------- */
 
 .btn-primary {
-    background-color: var(--color-brand-600);
-    border-color: var(--color-brand-600);
-    color: var(--text-inverse);
+    background-color: var(--color-accent-primary);
+    border-color: var(--color-accent-primary);
+    color: var(--text-on-accent);
 }
 .btn-primary:hover {
-    background-color: var(--color-brand-700);
-    border-color: var(--color-brand-700);
+    background-color: var(--color-accent-primary-hover);
+    border-color: var(--color-accent-primary-hover);
+    box-shadow: var(--glow-lime);
+}
+.btn-primary:active {
+    background-color: var(--color-accent-primary-active);
+    border-color: var(--color-accent-primary-active);
 }
 
 .btn-secondary {
-    background-color: var(--surface-card);
+    background-color: var(--surface-elevated);
     border-color: var(--border-color-strong);
     color: var(--text-primary);
 }
 .btn-secondary:hover {
-    background-color: var(--color-gray-50);
-    border-color: var(--color-gray-400);
+    background-color: var(--color-ink-700);
+    border-color: var(--color-ink-400);
 }
 
 .btn-ghost {
@@ -66,22 +86,22 @@
     color: var(--text-secondary);
 }
 .btn-ghost:hover {
-    background-color: var(--color-gray-100);
+    background-color: var(--surface-elevated);
     color: var(--text-primary);
 }
 
 .btn-danger {
     background-color: var(--color-danger-solid);
     border-color: var(--color-danger-solid);
-    color: var(--text-inverse);
+    color: var(--color-ink-0);
 }
 .btn-danger:hover {
-    background-color: #b42318;
-    border-color: #b42318;
+    background-color: #d42d40;
+    border-color: #d42d40;
 }
 
 .btn-danger-outline {
-    background-color: var(--surface-card);
+    background-color: transparent;
     border-color: var(--color-danger-border);
     color: var(--color-danger-text);
 }
@@ -92,22 +112,22 @@
 .btn-success {
     background-color: var(--color-success-solid);
     border-color: var(--color-success-solid);
-    color: var(--text-inverse);
+    color: var(--color-ink-950);
 }
 .btn-success:hover {
-    background-color: #0f7a47;
-    border-color: #0f7a47;
+    background-color: #3ee885;
+    border-color: #3ee885;
 }
 
 .btn-accent {
-    background-color: var(--color-accent-500);
-    border-color: var(--color-accent-500);
-    color: var(--color-gray-900);
+    background-color: var(--color-accent-secondary);
+    border-color: var(--color-accent-secondary);
+    color: var(--color-ink-0);
 }
 .btn-accent:hover {
-    background-color: var(--color-accent-600);
-    border-color: var(--color-accent-600);
-    color: var(--text-inverse);
+    background-color: var(--color-orange-400);
+    border-color: var(--color-orange-400);
+    box-shadow: var(--glow-orange);
 }
 
 /* ---- Sizes ------------------------------------------------------------ */
@@ -121,6 +141,7 @@
 .btn-lg {
     padding: var(--space-3) var(--space-6);
     font-size: var(--text-md);
+    border-radius: var(--radius-md);
 }
 
 .btn-block {

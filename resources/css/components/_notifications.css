@@ -11,15 +11,15 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: var(--radius-md);
     color: var(--text-secondary);
     transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .bell:hover {
-    background-color: var(--color-gray-100);
+    background-color: var(--surface-elevated);
     color: var(--text-primary);
 }
 
@@ -34,12 +34,13 @@
     height: 16px;
     padding-inline: 4px;
     border-radius: var(--radius-pill);
-    background-color: var(--color-danger-solid);
-    color: var(--color-white);
+    background-color: var(--color-accent-secondary);
+    color: var(--color-ink-0);
     font-size: 10px;
     font-weight: var(--weight-bold);
     line-height: 1;
     border: 2px solid var(--surface-card);
+    animation: pop-in var(--transition-base) var(--ease-spring);
 }
 
 .bell-badge:empty,
@@ -65,7 +66,7 @@
     border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
-    background-color: var(--surface-card);
+    background-color: var(--surface-elevated);
     z-index: 1;
 }
 
@@ -80,7 +81,7 @@
     text-align: center;
     position: sticky;
     bottom: 0;
-    background-color: var(--surface-card);
+    background-color: var(--surface-elevated);
 }
 
 /* ---- Item -------------------------------------------------------------- */
@@ -99,18 +100,18 @@
 }
 
 .notification:hover {
-    background-color: var(--color-gray-25);
+    background-color: var(--surface-card);
 }
 
 /* Unread carries a left rule rather than a background wash, so the tone
    colours of the icon stay readable. */
 .notification.is-unread {
-    background-color: var(--color-brand-50);
-    box-shadow: inset 3px 0 0 var(--color-brand-500);
+    background-color: rgba(198, 255, 62, 0.06);
+    box-shadow: inset 3px 0 0 var(--color-accent-primary);
 }
 
 .notification.is-unread:hover {
-    background-color: var(--color-brand-100);
+    background-color: rgba(198, 255, 62, 0.1);
 }
 
 .notification-icon {
@@ -192,7 +193,7 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    background-color: var(--color-brand-500);
+    background-color: var(--color-accent-primary);
     border-radius: 2px;
 }
 
@@ -200,10 +201,10 @@
     /* Owner-declared downtime reads differently from a paying booking. */
     background: repeating-linear-gradient(
         45deg,
-        var(--color-gray-400),
-        var(--color-gray-400) 4px,
-        var(--color-gray-300) 4px,
-        var(--color-gray-300) 8px
+        var(--color-ink-500),
+        var(--color-ink-500) 4px,
+        var(--color-ink-600) 4px,
+        var(--color-ink-600) 8px
     );
 }
 

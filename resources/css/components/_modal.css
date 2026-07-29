@@ -13,23 +13,24 @@
     width: 480px;
     max-width: calc(100vw - var(--space-8));
     padding: 0;
-    border: 1px solid var(--border-color);
+    border: 1px solid var(--border-color-strong);
     border-radius: var(--radius-xl);
-    background-color: var(--surface-card);
+    background-color: var(--surface-elevated);
     box-shadow: var(--shadow-lg);
     color: var(--text-primary);
 }
 
 .modal::backdrop {
-    background-color: rgba(22, 26, 36, 0.45);
+    background-color: rgba(5, 6, 8, 0.6);
+    backdrop-filter: blur(2px);
 }
 
 .modal[open] {
-    animation: modal-in 160ms ease;
+    animation: modal-in var(--transition-slow) var(--ease-spring);
 }
 
 @keyframes modal-in {
-    from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+    from { opacity: 0; transform: translateY(-10px) scale(0.96); }
     to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
@@ -45,6 +46,7 @@
 }
 
 .modal-title {
+    font-family: var(--font-display);
     font-size: var(--text-lg);
     font-weight: var(--weight-semibold);
     line-height: var(--leading-tight);
@@ -66,7 +68,7 @@
 }
 
 .modal-close:hover {
-    background-color: var(--color-gray-100);
+    background-color: var(--surface-card);
     color: var(--text-primary);
 }
 
@@ -81,7 +83,7 @@
     gap: var(--space-3);
     padding: var(--space-4) var(--space-5);
     border-top: 1px solid var(--border-color);
-    background-color: var(--color-gray-25);
+    background-color: var(--surface-sunken);
     border-bottom-left-radius: var(--radius-xl);
     border-bottom-right-radius: var(--radius-xl);
 }

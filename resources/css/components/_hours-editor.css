@@ -28,7 +28,7 @@
 }
 
 .hours-day.is-closed {
-    background-color: var(--color-gray-25);
+    background-color: var(--surface-sunken);
 }
 
 .hours-day-label {
@@ -120,6 +120,6 @@
     align-items: center;
     gap: var(--space-3);
     padding: var(--space-3) var(--space-4);
-    background-color: var(--color-gray-25);
+    background-color: var(--surface-sunken);
     border-top: 1px solid var(--border-color);
 }

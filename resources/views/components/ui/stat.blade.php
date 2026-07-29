@@ -11,7 +11,7 @@
     $tag = $href ? 'a' : 'div';
 @endphp
 
-<{{ $tag }} @if ($href) href="{{ $href }}" @endif {{ $attributes->merge(['class' => $classes]) }}>
+<{{ $tag }} @if ($href) href="{{ $href }}" @endif data-reveal {{ $attributes->merge(['class' => $classes]) }}>
     <span class="stat-label">{{ $label }}</span>
     <span class="stat-value">{{ $value }}</span>
     @if ($meta)<span class="stat-meta">{{ $meta }}</span>@endif
