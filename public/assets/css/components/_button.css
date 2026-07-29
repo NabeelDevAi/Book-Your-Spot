@@ -1,0 +1,169 @@
+/*
+ |----------------------------------------------------------------------
+ | Buttons
+ |----------------------------------------------------------------------
+ | .btn is the base; a variant class sets the colours and a size class
+ | adjusts the box. Owner-facing actions (approve / reject) get their own
+ | variants because NFR-5 wants those decisions readable at a glance.
+ |
+ | Every button gets the same tactile feedback: a small lift on hover, a
+ | compress on press. Primary additionally picks up a lime glow -- the
+ | product's one unmistakable "go" signal, used nowhere else.
+ */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    line-height: 1.25;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color var(--transition-fast),
+                border-color var(--transition-fast),
+                color var(--transition-fast),
+                box-shadow var(--transition-base),
+                transform var(--transition-fast);
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn:active {
+    transform: translateY(0) scale(0.97);
+    transition-duration: 80ms;
+}
+
+.btn:focus-visible {
+    outline: none;
+    box-shadow: var(--ring-accent);
+}
+
+.btn:disabled,
+.btn.is-disabled {
+    opacity: 0.45;
+    pointer-events: none;
+    transform: none;
+}
+
+/* ---- Variants -------------------------------------------------------- */
+
+.btn-primary {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--text-on-accent);
+}
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+    border-color: var(--accent-hover);
+    box-shadow: var(--glow-accent);
+}
+.btn-primary:active {
+    background-color: var(--accent-press);
+    border-color: var(--accent-press);
+}
+
+.btn-secondary {
+    background-color: var(--surface-raised);
+    border-color: var(--border-color-strong);
+    color: var(--text-primary);
+}
+.btn-secondary:hover {
+    background-color: var(--surface-raised);
+    border-color: var(--color-ink-400);
+}
+
+.btn-ghost {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--text-secondary);
+}
+.btn-ghost:hover {
+    background-color: var(--surface-raised);
+    color: var(--text-primary);
+}
+
+.btn-danger {
+    background-color: var(--color-danger-solid);
+    border-color: var(--color-danger-solid);
+    color: var(--text-on-board);
+}
+.btn-danger:hover {
+    background-color: #d42d40;
+    border-color: #d42d40;
+}
+
+.btn-danger-outline {
+    background-color: transparent;
+    border-color: var(--color-danger-border);
+    color: var(--danger-text);
+}
+.btn-danger-outline:hover {
+    background-color: var(--danger-surface);
+}
+
+.btn-success {
+    background-color: var(--color-success-solid);
+    border-color: var(--color-success-solid);
+    color: var(--surface-board);
+}
+.btn-success:hover {
+    background-color: #3ee885;
+    border-color: #3ee885;
+}
+
+.btn-accent {
+    background-color: var(--warning);
+    border-color: var(--warning);
+    color: var(--text-on-board);
+}
+.btn-accent:hover {
+    background-color: var(--warning);
+    border-color: var(--warning);
+    box-shadow: var(--glow-accent);
+}
+
+/* ---- Sizes ------------------------------------------------------------ */
+
+.btn-sm {
+    padding: var(--space-1) var(--space-3);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+    padding: var(--space-3) var(--space-6);
+    font-size: var(--text-md);
+    border-radius: var(--radius-md);
+}
+
+.btn-block {
+    display: flex;
+    width: 100%;
+}
+
+/* ---- Icon-only --------------------------------------------------------- */
+
+.btn-icon {
+    padding: var(--space-2);
+    line-height: 0;
+}
+
+.btn-icon.btn-sm {
+    padding: var(--space-1);
+}
+
+/* ---- Button group ------------------------------------------------------- */
+
+.btn-group {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}

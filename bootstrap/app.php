@@ -29,6 +29,13 @@ return Application::configure(basePath: dirname(__DIR__))
             'password.changed' => RequirePasswordChange::class,
         ]);
 
+        // The theme preference is written by theme.js via document.cookie, so
+        // it never passes through Laravel's encryption. Left encrypted, it
+        // would fail to decrypt and silently read as null on every request --
+        // which shows up as the page flashing the wrong theme on load.
+        // It holds no secret: the value is "light" or "dark".
+        $middleware->encryptCookies(except: ['theme']);
+
         // Appended to the whole web group rather than to individual route
         // files: a suspension or a forced password change has to take effect
         // everywhere at once, including the public pages, not only in the

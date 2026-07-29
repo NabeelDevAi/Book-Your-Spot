@@ -1,0 +1,239 @@
+/*
+ |----------------------------------------------------------------------
+ | Notification bell, dropdown & list
+ |----------------------------------------------------------------------
+ | With no email in V1 this is the only channel, so it has to read clearly
+ | at a glance rather than being a decorative bell.
+ */
+
+.bell {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.bell:hover {
+    background-color: var(--surface-raised);
+    color: var(--text-primary);
+}
+
+.bell-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 16px;
+    height: 16px;
+    padding-inline: 4px;
+    border-radius: var(--radius-pill);
+    background-color: var(--warning);
+    color: var(--text-on-board);
+    font-size: 10px;
+    font-weight: var(--weight-bold);
+    line-height: 1;
+    border: 2px solid var(--surface-card);
+    animation: pop-in var(--transition-base) var(--ease-spring);
+}
+
+.bell-badge:empty,
+.bell-badge[hidden] {
+    display: none;
+}
+
+/* ---- Dropdown panel ---------------------------------------------------- */
+
+.notification-menu {
+    width: 380px;
+    max-height: 460px;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.notification-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    background-color: var(--surface-raised);
+    z-index: 1;
+}
+
+.notification-menu-title {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+}
+
+.notification-menu-footer {
+    padding: var(--space-2) var(--space-4);
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    position: sticky;
+    bottom: 0;
+    background-color: var(--surface-raised);
+}
+
+/* ---- Item -------------------------------------------------------------- */
+
+.notification {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color var(--transition-fast);
+}
+
+.notification:last-child {
+    border-bottom: none;
+}
+
+.notification:hover {
+    background-color: var(--surface-card);
+}
+
+/* Unread carries a left rule rather than a background wash, so the tone
+   colours of the icon stay readable. */
+.notification.is-unread {
+    background-color: rgba(255, 178, 36, 0.06);
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.notification.is-unread:hover {
+    background-color: rgba(255, 178, 36, 0.1);
+}
+
+.notification-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    border-radius: var(--radius-pill);
+}
+
+.notification-icon.tone-success { background-color: var(--success-surface); color: var(--success-text); }
+.notification-icon.tone-warning { background-color: var(--warning-surface); color: var(--warning-text); }
+.notification-icon.tone-danger  { background-color: var(--danger-surface);  color: var(--danger-text); }
+.notification-icon.tone-info    { background-color: var(--info-surface);    color: var(--info-text); }
+.notification-icon.tone-neutral { background-color: var(--surface-sunken);        color: var(--text-muted); }
+
+.notification-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.notification-title {
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+}
+
+.notification-text {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: var(--leading-snug);
+    margin-top: 2px;
+}
+
+.notification-time {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    margin-top: var(--space-1);
+}
+
+/* ---- Occupancy timeline (owner dashboard) --------------------------------- */
+
+.occupancy {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.occupancy-row {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: var(--space-3);
+    align-items: center;
+}
+
+.occupancy-label {
+    font-size: var(--text-sm);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.occupancy-label-venue {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.occupancy-track {
+    position: relative;
+    height: 22px;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-sunken);
+    overflow: hidden;
+}
+
+.occupancy-block {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: var(--accent);
+    border-radius: 2px;
+}
+
+.occupancy-block.is-block {
+    /* Owner-declared downtime reads differently from a paying booking. */
+    background: repeating-linear-gradient(
+        45deg,
+        var(--color-ink-500),
+        var(--color-ink-500) 4px,
+        var(--surface-raised) 4px,
+        var(--surface-raised) 8px
+    );
+}
+
+.occupancy-scale {
+    display: grid;
+    grid-template-columns: 160px minmax(0, 1fr);
+    gap: var(--space-3);
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.occupancy-scale-marks {
+    display: flex;
+    justify-content: space-between;
+}
+
+.occupancy-legend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.occupancy-legend-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    vertical-align: -2px;
+    margin-right: var(--space-1);
+}

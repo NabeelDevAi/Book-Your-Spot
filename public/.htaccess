@@ -23,3 +23,27 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# ----------------------------------------------------------------------
+# Asset caching
+# ----------------------------------------------------------------------
+# There is no bundler, so filenames are not content-hashed. app.css and
+# app.js carry a ?v= stamp (see App\Support\Assets), but the partials they
+# @import are referenced by hardcoded relative URLs that cannot carry one.
+#
+# So CSS and JS are cached but always revalidated: the browser keeps the
+# bytes and asks "still current?", and Apache answers 304 from the ETag
+# unless the file really changed. A handful of ~100-byte conditional
+# requests per load, and it can never serve a stale partial -- which is the
+# failure a naive max-age would cause every single deploy.
+#
+# Fonts are the one genuinely immutable case, so they get cached hard.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+
+    <FilesMatch "\.(woff2|ico)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>

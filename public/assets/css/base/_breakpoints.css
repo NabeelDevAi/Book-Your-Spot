@@ -1,0 +1,60 @@
+/*
+ |----------------------------------------------------------------------
+ | Degradation breakpoints
+ |----------------------------------------------------------------------
+ | V1 targets desktop (NFR-7) and this is NOT a mobile layout. What it is:
+ | insurance for the bottom of the desktop range -- 1280px laptops, half-
+ | tiled windows, and browsers with a sidebar open.
+ |
+ | The previous build had zero media queries and `min-width: 1280px` on the
+ | body, so anything narrower produced a horizontal scrollbar. Multi-column
+ | grids are the only things that need to give; nothing here restyles a
+ | component or hides content.
+ |
+ | Deliberately last in the import order so these can win on specificity
+ | ties without !important.
+ */
+
+/* ---- Below 1280: the dense grids drop a column ----------------------- */
+@media (max-width: 1279px) {
+    .venue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .stat-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    /* The search panel's primary row keeps its search field wide and wraps
+       the rest underneath rather than crushing five controls onto one line. */
+    .search-row { grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr)); }
+    .search-row-secondary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .slot-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ---- Below 1100: aside columns stop being viable --------------------- */
+@media (max-width: 1099px) {
+    .layout-with-aside,
+    .layout-with-aside-left,
+    .dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* A sticky aside that has just become a full-width block underneath the
+       content should not also try to pin itself. */
+    .aside-sticky {
+        position: static;
+    }
+
+    .venue-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .venue-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: 140px 140px;
+    }
+
+    .console-sidebar { width: 68px; }
+    .console-sidebar .sidebar-link span,
+    .console-sidebar .business-switcher-name,
+    .console-sidebar .business-switcher-meta,
+    .console-sidebar .sidebar-heading,
+    .console-sidebar .brand > span:not(.brand-mark) { display: none; }
+    .console-sidebar .sidebar-link { justify-content: center; }
+}

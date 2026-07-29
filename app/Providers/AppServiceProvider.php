@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
@@ -68,6 +69,28 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerAdminOverride();
         $this->registerRateLimiters();
+        $this->registerThemeDirective();
+    }
+
+    /**
+     * `@themeAttribute` -- renders data-theme onto <html> from the cookie.
+     *
+     * Server-rendering the choice is what makes the theme switch flash-free.
+     * The usual approach is an inline blocking script in <head>, but that only
+     * exists because the preference is trapped in localStorage where the server
+     * cannot see it. In a cookie, Blade can emit the attribute before a byte of
+     * CSS is parsed -- nothing to sequence, and it still works with JS off.
+     *
+     * Absent or unrecognised means "follow the OS", which the stylesheet
+     * handles via `color-scheme: light dark`. The whitelist matters: the cookie
+     * is written by client-side JS and excluded from encryption, so it must be
+     * treated as untrusted input rather than interpolated into markup.
+     */
+    private function registerThemeDirective(): void
+    {
+        // Emitted as one line: a multi-line PHP block inside a directive would
+        // put its own newlines and indentation into the markup.
+        Blade::directive('themeAttribute', fn () => "<?php echo in_array(request()->cookie('theme'), ['light', 'dark'], true) ? ' data-theme=\"'.request()->cookie('theme').'\"' : ''; ?>");
     }
 
     /**

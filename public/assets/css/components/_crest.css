@@ -1,0 +1,69 @@
+/*
+ |----------------------------------------------------------------------
+ | Venue crest
+ |----------------------------------------------------------------------
+ | Generated artwork standing in for photography that does not exist.
+ | See App\Support\VenueCrest for the scheme and motif logic.
+ |
+ | Crests are dark in both themes on purpose -- they belong to the board
+ | vocabulary, and a tile that flipped to light would stop reading as the
+ | same object when the theme changed.
+ */
+
+.crest {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-color: var(--surface-board);
+}
+
+/* The media slot a crest or a real photo drops into. Both fill it
+   identically, so a venue uploading its first photo changes nothing about
+   the layout. */
+.crest-frame {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--surface-board);
+    isolation: isolate;
+}
+
+.crest-frame > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/*
+ | Slow drift on hover. The crest is generated line-work rather than a
+ | photograph, so a scale-up would just make the strokes coarse -- a small
+ | parallax shift keeps it feeling alive without magnifying the artwork.
+ */
+.crest-frame > .crest,
+.crest-frame > img {
+    transition: transform var(--duration-slower) var(--ease-out);
+}
+
+a:hover .crest-frame > .crest,
+a:hover .crest-frame > img {
+    transform: scale(1.04);
+}
+
+/* A wash at the foot of the frame so overlaid text (price, status) always
+   has something to sit on, whatever the crest scheme underneath. */
+.crest-frame.has-overlay::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 55%;
+    pointer-events: none;
+    background: linear-gradient(to top, rgba(4, 5, 10, 0.85), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    a:hover .crest-frame > .crest,
+    a:hover .crest-frame > img {
+        transform: none;
+    }
+}

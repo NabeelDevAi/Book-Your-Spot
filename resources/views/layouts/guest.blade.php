@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @themeAttribute>
 <head>
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{{ isset($title) ? $title.' — '.config('app.name') : config('app.name') }}</title>
 
     <link rel="icon" href="/favicon.ico" sizes="any">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <x-assets />
 </head>
 <body>
     <div class="auth-shell">

@@ -11,8 +11,12 @@ setup described in the SRS: one city, desktop-only web, no payment provider.
 |---|---|---|
 | PHP | 8.3+ | Extensions: `pdo_mysql`, `mbstring`, `openssl`, `gd`, `zip`, `pcntl` |
 | MySQL | 8.0+ | InnoDB. Row-level locking is **required** — see §6 |
-| Node | 22+ | Build-time only; not needed at runtime |
 | Composer | 2.x | |
+
+**Node is not required, at build time or runtime.** There is no bundler: CSS and
+JS are served from `public/assets/` exactly as they are written, using native
+`@import` and native ES modules. Deploying is `composer install` — there is
+nothing to build.
 
 `pcntl` is only used by the concurrency test suite, not by the application.
 
@@ -28,7 +32,6 @@ git clone <repo> /var/www/html/book-your-spot
 cd /var/www/html/book-your-spot
 
 composer install --no-dev --optimize-autoloader
-npm ci && npm run build
 
 cp .env.example .env
 php artisan key:generate
@@ -226,7 +229,6 @@ php artisan down --render="errors::503"
 
 git pull
 composer install --no-dev --optimize-autoloader
-npm ci && npm run build
 php artisan migrate --force
 
 php artisan config:cache && php artisan route:cache && php artisan view:cache

@@ -1,0 +1,722 @@
+/*
+ |----------------------------------------------------------------------
+ | Venue cards, search results & availability display
+ |----------------------------------------------------------------------
+ */
+
+/* ---- Search hero ------------------------------------------------------ */
+
+/*
+ | The hero is a board (see components/_board.css) -- it carries .board
+ | .board-lines .board-lit in the markup, which handles the dark surface,
+ | the court grid, the single warm light source, and the token rebasing
+ | that keeps its text legible in BOTH themes.
+ |
+ | The old version had two symmetrical radial blobs in opposite corners,
+ | which is the exact gradient-blob cliche the brief rules out, and its
+ | text used page-level tokens -- so the moment a light theme existed the
+ | headline turned near-black on near-black and disappeared.
+ */
+.search-hero {
+    padding-block: var(--space-20) var(--space-12);
+    margin-bottom: var(--space-12);
+    overflow: hidden;
+}
+
+.search-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 1.2rem + 5.4vw, var(--text-6xl));
+    font-weight: var(--weight-extrabold);
+    letter-spacing: -0.038em;
+    line-height: 0.94;
+    max-width: 15ch;
+    text-wrap: balance;
+}
+
+.search-hero-subtitle {
+    margin-top: var(--space-3);
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+    max-width: 52ch;
+}
+
+/* ---- Category chips (extensible: label-only, works for any future
+   venue category -- sport, hall, event space -- with zero new markup) --- */
+
+.category-chips,
+.category-rail {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    margin-top: var(--space-8);
+}
+
+.category-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--border-color-strong);
+    background-color: var(--neutral-surface);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    white-space: nowrap;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast),
+                color var(--transition-fast), transform var(--transition-fast);
+}
+
+.category-chip:hover {
+    border-color: var(--text-muted);
+    background-color: var(--neutral-line);
+    transform: translateY(-1px);
+}
+
+.category-chip.is-active {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: var(--text-on-accent);
+}
+
+/* The filter panel sits on the hero, half-overlapping the content below. */
+.search-panel {
+    margin-top: var(--space-6);
+    padding: var(--space-4);
+    background-color: var(--surface-raised);
+    border: 1px solid var(--border-color-strong);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.search-row {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)) auto;
+    gap: var(--space-3);
+    align-items: end;
+}
+
+.search-row-secondary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-3);
+    align-items: end;
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+}
+
+/*
+ | Refine drawer. A native <details> rather than a JS panel: keyboard and
+ | screen-reader behaviour comes free, it works with JS disabled, and the
+ | server can decide to render it open when the customer already has these
+ | filters applied.
+ */
+.search-refine {
+    margin-top: var(--space-2);
+}
+
+.search-refine-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    margin-left: calc(var(--space-3) * -1);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: color var(--transition-fast), background-color var(--transition-fast);
+}
+
+/* Safari still paints its own disclosure triangle without this. */
+.search-refine-toggle::-webkit-details-marker { display: none; }
+
+.search-refine-toggle:hover {
+    color: var(--text-primary);
+    background-color: var(--neutral-surface);
+}
+
+.search-refine-toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--ring-accent);
+}
+
+.search-refine-caret {
+    transition: transform var(--transition-base);
+}
+
+.search-refine[open] .search-refine-caret {
+    transform: rotate(180deg);
+}
+
+.search-refine[open] .search-row-secondary {
+    animation: fade-slide-up var(--duration-base) var(--ease-out);
+}
+
+/* ---- Result summary --------------------------------------------------- */
+
+.result-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-5);
+}
+
+.active-filters {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 3px var(--space-2);
+    border-radius: var(--radius-pill);
+    background-color: rgba(255, 178, 36, 0.1);
+    color: var(--accent-text);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+}
+
+.filter-chip a {
+    display: flex;
+    line-height: 0;
+    opacity: 0.6;
+}
+
+.filter-chip a:hover {
+    opacity: 1;
+}
+
+/* ---- Venue card -------------------------------------------------------- */
+
+.venue-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-5);
+}
+
+/*
+ | The card leads with the crest, but its actual content is the ribbon: the
+ | question a customer arrives with is "can I get in tonight", not "what does
+ | this place look like". Name and area identify it; the ribbon answers it.
+ */
+.venue-card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--surface-card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: border-color var(--transition-base),
+                box-shadow var(--transition-base),
+                transform var(--transition-base);
+}
+
+.venue-card:hover {
+    border-color: var(--accent-line);
+    box-shadow: var(--shadow-md);
+    /* Enough lift to actually register. The previous build used 4px with no
+       shadow change, which reads as a rendering glitch rather than a hover. */
+    transform: translateY(-6px);
+}
+
+.venue-card:focus-visible {
+    outline: none;
+    box-shadow: var(--ring-accent), var(--shadow-md);
+}
+
+.venue-card-media {
+    position: relative;
+    height: 172px;
+    flex: 0 0 auto;
+}
+
+/* ---- Status flag ------------------------------------------------------- */
+
+.venue-card-badges {
+    position: absolute;
+    inset-inline: var(--space-3);
+    bottom: var(--space-3);
+    display: flex;
+    gap: var(--space-2);
+    z-index: 1;
+}
+
+.venue-card-flag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 4px var(--space-3);
+    border-radius: var(--radius-pill);
+    /* Sits on a crest, which is dark in both themes -- so this is explicitly
+       light-on-dark rather than theme-following. */
+    background-color: rgba(4, 5, 10, 0.72);
+    backdrop-filter: blur(6px);
+    color: #d5dced;
+    font-size: var(--text-2xs);
+    font-weight: var(--weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+}
+
+.venue-card-flag.is-open { color: #4fe0ac; }
+
+.venue-card-flag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background-color: currentColor;
+    box-shadow: 0 0 8px currentColor;
+    animation: pulse-dot 2.4s var(--ease-in-out) infinite;
+}
+
+/* ---- Body -------------------------------------------------------------- */
+
+.venue-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-5);
+    flex: 1 1 auto;
+}
+
+.venue-card-name {
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-snug);
+    color: var(--text-primary);
+    line-height: var(--leading-tight);
+}
+
+.venue-card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+}
+
+.venue-card-ribbon {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+
+.venue-card-ribbon-caption {
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.venue-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: auto;
+    padding-top: var(--space-4);
+}
+
+/* ---- Footer ------------------------------------------------------------- */
+
+.venue-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--line);
+    background-color: var(--surface-sunken);
+}
+
+.venue-card-price {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.venue-card-price-label {
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+}
+
+/* Price set as a display object, not a label. It is one of the three things
+   the card exists to communicate, so it gets the display face and real size. */
+.venue-card-price-value {
+    font-family: var(--font-display);
+    font-size: var(--text-md);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-snug);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.venue-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: color var(--transition-fast), gap var(--transition-fast);
+}
+
+.venue-card:hover .venue-card-cta {
+    color: var(--accent-text);
+    gap: var(--space-3);
+}
+
+/* ---- Venue detail ------------------------------------------------------- */
+
+.venue-gallery {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: 120px 120px;
+    gap: var(--space-2);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-bottom: var(--space-6);
+}
+
+.venue-gallery > :first-child {
+    grid-row: span 2;
+}
+
+.venue-gallery img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.venue-gallery-empty {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    background-color: var(--surface-sunken);
+    color: var(--text-muted);
+}
+
+/* ---- Spot row on the venue page ------------------------------------------ */
+
+.spot-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-card);
+    align-items: center;
+    transition: border-color var(--transition-base);
+}
+
+.spot-row:hover {
+    border-color: var(--color-ink-400);
+}
+
+.spot-row + .spot-row {
+    margin-top: var(--space-3);
+}
+
+.spot-row.is-full {
+    background-color: var(--surface-sunken);
+}
+
+.spot-row-name {
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-md);
+}
+
+.spot-row-meta {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.spot-row-price {
+    font-weight: var(--weight-semibold);
+    color: var(--text-primary);
+}
+
+/* ---- Availability windows -------------------------------------------------- */
+
+.availability {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+}
+
+.availability-window {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+    background-color: var(--success-surface);
+    border: 1px solid var(--success-line);
+    color: var(--success-text);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    font-variant-numeric: tabular-nums;
+}
+
+.availability-none {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ---- Date strip ------------------------------------------------------------ */
+
+.date-strip {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+}
+
+.date-chip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 62px;
+    padding: var(--space-2);
+    border: 1px solid var(--border-color-strong);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-card);
+    flex: 0 0 auto;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast),
+                transform var(--transition-fast);
+}
+
+.date-chip:hover {
+    border-color: var(--text-muted);
+    transform: translateY(-1px);
+}
+
+.date-chip.is-active {
+    border-color: var(--accent);
+    background-color: var(--accent);
+    color: var(--text-on-accent);
+}
+
+.date-chip-day {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+}
+
+.date-chip.is-active .date-chip-day {
+    color: rgba(16, 12, 2, 0.72);
+}
+
+.date-chip-date {
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+}
+
+/* ---- Time slot picker -------------------------------------------------------- */
+
+.slot-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: var(--space-2);
+    transition: opacity var(--transition-fast);
+}
+
+.slot-grid[aria-busy="true"] {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+.slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    padding: var(--space-2) var(--space-1);
+    border: 1px solid var(--border-color-strong);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-card);
+    cursor: pointer;
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast),
+                transform var(--transition-fast);
+    animation: pop-in var(--transition-base) var(--ease-out) backwards;
+}
+
+.slot:hover {
+    border-color: var(--text-muted);
+    transform: translateY(-1px);
+}
+
+.slot input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.slot:has(input:checked) {
+    border-color: var(--accent);
+    background-color: var(--accent);
+    color: var(--text-on-accent);
+    font-weight: var(--weight-semibold);
+    animation: pulse-ring var(--transition-slow) var(--ease-out);
+}
+
+.slot-end {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.slot:has(input:checked) .slot-end {
+    color: rgba(16, 12, 2, 0.72);
+}
+
+/* ---- Booking summary panel ------------------------------------------------------ */
+
+.booking-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.booking-summary-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-size: var(--text-base);
+}
+
+.booking-summary-row dt {
+    color: var(--text-muted);
+}
+
+.booking-summary-row dd {
+    margin: 0;
+    font-weight: var(--weight-medium);
+    text-align: right;
+}
+
+.booking-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-color);
+}
+
+.booking-total-value {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: -0.02em;
+    color: var(--accent);
+}
+
+.booking-total-note {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+/* ---- Reference code (quoted at the venue) ----------------------------------------- */
+
+.reference-code {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    border: 1px dashed var(--border-color-strong);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-sunken);
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.08em;
+    color: var(--accent);
+}
+
+/* ---- Venue hero --------------------------------------------------------- */
+/*
+ | Crest on the left, identity on the right. The crest is the same artwork the
+ | card showed, and both carry view-transition-name: venue-crest so the browser
+ | morphs one into the other on navigation.
+ */
+
+.venue-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+    gap: var(--space-8);
+    align-items: center;
+    margin-bottom: var(--space-8);
+}
+
+.venue-hero-media {
+    aspect-ratio: 16 / 10;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+}
+
+.venue-hero-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+/* The venue name is the largest thing on the page. With no photography to
+   carry it, the type has to. */
+.venue-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.25rem, 1.2rem + 3vw, var(--text-5xl));
+    font-weight: var(--weight-extrabold);
+    letter-spacing: var(--tracking-tight);
+    line-height: 0.98;
+    text-wrap: balance;
+}
+
+.venue-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-6);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+}
+
+/* Secondary photos, only rendered when a venue actually has more than one. */
+.venue-gallery {
+    grid-template-rows: 132px;
+}
+
+/* Skeleton placeholder rendered while start times are being refetched.
+   Same box as a real slot so the grid does not reflow when they swap. */
+.slot.is-skeleton {
+    height: 52px;
+    border-color: transparent;
+    pointer-events: none;
+    cursor: default;
+    animation: shimmer 1.5s var(--ease-in-out) infinite;
+}

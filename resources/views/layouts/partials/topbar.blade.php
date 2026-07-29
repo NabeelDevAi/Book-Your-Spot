@@ -1,5 +1,5 @@
 <header class="topbar">
-    <div class="container topbar-inner">
+    <div class="container-box topbar-inner">
         <x-brand :href="route('home')" />
 
         <nav class="topbar-nav" aria-label="Main">
@@ -24,6 +24,8 @@
         </nav>
 
         <div class="cluster-2 ml-auto">
+            <x-ui.theme-toggle />
+
             @guest
                 <a href="{{ route('login') }}" class="btn btn-ghost btn-sm">Log in</a>
                 <x-ui.button :href="route('register')" variant="primary" size="sm">Sign up</x-ui.button>

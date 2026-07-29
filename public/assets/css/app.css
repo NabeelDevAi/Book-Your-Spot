@@ -1,0 +1,57 @@
+/*
+ |----------------------------------------------------------------------
+ | BookYourSpot -- application stylesheet
+ |----------------------------------------------------------------------
+ | Hand-written CSS, no framework. Import order matters:
+ |   tokens -> reset -> typography -> utilities -> components -> layouts
+ |
+ | Rules of the house:
+ |   1. No hardcoded colours or spacing outside base/_tokens.css.
+ |   2. Both themes are authored together. A rule that only works in one
+ |      of them is a bug, not a variant -- use the light-dark() tokens.
+ |   3. Component classes describe what a thing IS, not how it looks.
+ |   4. Desktop is a range, not a width. The shell is fluid; breakpoints
+ |      exist only to degrade gracefully, not to build a mobile layout.
+ |
+ | Served as-is -- there is no bundler, so this file is parsed by the
+ | browser and each @import below is a real request. Keep the list short
+ | and keep it ordered: tokens must land before anything reads them.
+ */
+
+/* ---- Base ---------------------------------------------------------- */
+@import "./base/_tokens.css";
+@import "./base/_fonts.css";
+@import "./base/_reset.css";
+@import "./base/_typography.css";
+@import "./base/_utilities.css";
+@import "./base/_motion.css";
+
+/* ---- Components ---------------------------------------------------- */
+@import "./components/_board.css";
+@import "./components/_ribbon.css";
+@import "./components/_crest.css";
+@import "./components/_stub.css";
+@import "./components/_button.css";
+@import "./components/_theme-toggle.css";
+@import "./components/_segmented.css";
+@import "./components/_form.css";
+@import "./components/_card.css";
+@import "./components/_badge.css";
+@import "./components/_alert.css";
+@import "./components/_table.css";
+@import "./components/_nav.css";
+@import "./components/_modal.css";
+@import "./components/_pagination.css";
+@import "./components/_hours-editor.css";
+@import "./components/_image-upload.css";
+@import "./components/_venue.css";
+@import "./components/_notifications.css";
+@import "./components/_chart.css";
+
+/* ---- Layouts ------------------------------------------------------- */
+@import "./layouts/_app.css";
+@import "./layouts/_auth.css";
+@import "./layouts/_console.css";
+
+/* ---- Degradation (must stay last) ---------------------------------- */
+@import "./base/_breakpoints.css";

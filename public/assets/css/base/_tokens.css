@@ -1,0 +1,355 @@
+/*
+ |----------------------------------------------------------------------
+ | Design Tokens -- "Floodlight"
+ |----------------------------------------------------------------------
+ | Every colour, space, radius, shadow and type size resolves to one of
+ | these. Nothing downstream hardcodes a hex -- if you need a new value,
+ | add it here first so the system stays coherent.
+ |
+ | THE IDEA
+ | This product has no photography and never will, so the visual material
+ | is time itself: availability, rendered. The palette is built around
+ | that one binary -- a spot is OPEN or it is TAKEN -- and around the
+ | light that makes a venue usable after dark.
+ |
+ |   accent  = the floodlight. Hot amber. Brand, CTAs, "now", energy.
+ |   open    = a lit court. Luminous mint. Availability, and ONLY
+ |             availability -- it is semantic, never decorative.
+ |   busy    = court in shadow. Recedes, never competes.
+ |
+ | That restraint is the whole trick. Two accents with one meaning each
+ | reads as designed; two accents sprinkled for variety reads as noise.
+ |
+ | THEMING
+ | Values are declared once via light-dark(). `color-scheme` decides which
+ | half applies, so the theme toggle flips a single property instead of
+ | re-declaring 80 custom properties per theme. It also gets us native
+ | form controls, scrollbars and caret colours for free.
+ |
+ | Argument order is always light-dark(LIGHT, DARK).
+ */
+
+:root {
+    /* Follow the OS until the user says otherwise; theme.js sets an
+       explicit theme on <html> when they do. */
+    color-scheme: light dark;
+
+    /*
+     |------------------------------------------------------------------
+     | Surfaces
+     |------------------------------------------------------------------
+     | Light is warm chalk-on-paper; dark is a blue-biased night, never
+     | neutral grey. Neutral grey is what made the old build read as an
+     | admin panel -- a blue bias reads as evening.
+     |
+     | `--surface-board` is deliberately dark in BOTH themes. It is the
+     | floodlit panel that hosts ribbons and booking UI, and the contrast
+     | of a dark board inside a light page is the product's signature.
+     */
+    --surface-page:     light-dark(#f6f4ef, #07090e);
+    --surface-card:     light-dark(#ffffff, #0e1219);
+    --surface-raised:   light-dark(#ffffff, #161b25);
+    --surface-overlay:  light-dark(#ffffff, #1d232f);
+    --surface-sunken:   light-dark(#edeae3, #04050a);
+    --surface-board:    light-dark(#0e1219, #04050a);
+    --surface-inverse:  light-dark(#12151c, #f2f5f9);
+
+    /*
+     |------------------------------------------------------------------
+     | Lines
+     |------------------------------------------------------------------
+     | `--line-paint` is the court marking: opaque, deliberate, 2px in
+     | use. It is what makes the geometry read as drawn rather than as an
+     | accidental hairline.
+     */
+    --line:        light-dark(rgba(18, 21, 28, 0.10), rgba(242, 245, 249, 0.09));
+    --line-strong: light-dark(rgba(18, 21, 28, 0.18), rgba(242, 245, 249, 0.16));
+    --line-paint:  light-dark(rgba(18, 21, 28, 0.28), rgba(242, 245, 249, 0.24));
+
+    /* ---- Text ------------------------------------------------------- */
+    --text-primary:   light-dark(#12151c, #f2f5f9);
+    --text-secondary: light-dark(#4c5768, #a3aec2);
+    /*
+     | Measured, not eyeballed. The first pass used #7a8698 / #6f7b92, which
+     | came out at 3.36:1 and 4.40:1 against their own backgrounds -- both
+     | below the 4.5:1 WCAG AA floor for body-sized text, and muted text is
+     | used for venue meta, breadcrumbs, hints and ribbon captions, so it is
+     | far from decorative.
+     |
+     | These values clear 4.5:1 on BOTH the page and the card surface, which
+     | is the binding constraint -- a value that passes on the page can still
+     | fail on the lighter card sitting on top of it.
+     */
+    --text-muted:     light-dark(#5f6d80, #78849b);
+    --text-inverse:   light-dark(#f6f4ef, #07090e);
+    /* A board panel is dark in both themes, so text on it cannot follow
+       the theme. */
+    --text-on-board:       #f2f5f9;
+    --text-on-board-muted: #8b96ab;
+
+    /*
+     |------------------------------------------------------------------
+     | Accent -- the floodlight
+     |------------------------------------------------------------------
+     | The amber FILL is identical in both themes: it is the brand, and a
+     | brand that shifts hue between themes stops being recognisable.
+     |
+     | Amber text on white would fail contrast, so tinted text gets its
+     | own darker token. Systems that skip this split ship unreadable
+     | links on light backgrounds.
+     */
+    --accent:         #ffb224;
+    --accent-hover:   #ffc658;
+    --accent-press:   #e89a0c;
+    --accent-text:    light-dark(#8f5400, #ffc658);
+    --accent-surface: light-dark(rgba(255, 178, 36, 0.14), rgba(255, 178, 36, 0.12));
+    --accent-line:    light-dark(rgba(255, 178, 36, 0.42), rgba(255, 178, 36, 0.32));
+    --text-on-accent: #100c02;
+
+    /*
+     |------------------------------------------------------------------
+     | Availability -- reserved meaning, used nowhere else
+     |------------------------------------------------------------------
+     */
+    --open:         light-dark(#0fa97b, #4fe0ac);
+    --open-text:    light-dark(#07845f, #4fe0ac);
+    --open-surface: light-dark(rgba(15, 169, 123, 0.12), rgba(79, 224, 172, 0.13));
+    --open-line:    light-dark(rgba(15, 169, 123, 0.34), rgba(79, 224, 172, 0.30));
+
+    /* Taken time. Recedes on purpose -- it is the negative space the lit
+       segments get read against. */
+    --busy:          light-dark(#d2cec5, #1e2635);
+    --busy-on-board: #1e2635;
+
+    /*
+     |------------------------------------------------------------------
+     | Status
+     |------------------------------------------------------------------
+     | Kept clear of both accents so "confirmed" is never mistaken for a
+     | primary action, and "warning" is never mistaken for the brand.
+     */
+    --success:         light-dark(#0e9f6e, #34d399);
+    --success-text:    light-dark(#07734f, #6ee7b7);
+    --success-surface: light-dark(rgba(14, 159, 110, 0.12), rgba(52, 211, 153, 0.12));
+    --success-line:    light-dark(rgba(14, 159, 110, 0.32), rgba(52, 211, 153, 0.30));
+
+    --warning:         light-dark(#c2410c, #fb923c);
+    --warning-text:    light-dark(#9a3412, #fdba74);
+    --warning-surface: light-dark(rgba(194, 65, 12, 0.10), rgba(251, 146, 60, 0.12));
+    --warning-line:    light-dark(rgba(194, 65, 12, 0.28), rgba(251, 146, 60, 0.30));
+
+    --danger:          light-dark(#dc2b3e, #ff5468);
+    --danger-text:     light-dark(#b01527, #ff8b98);
+    --danger-surface:  light-dark(rgba(220, 43, 62, 0.10), rgba(255, 84, 104, 0.12));
+    --danger-line:     light-dark(rgba(220, 43, 62, 0.30), rgba(255, 84, 104, 0.32));
+
+    --info:            light-dark(#3b6fd4, #7fa8ff);
+    --info-text:       light-dark(#2b53a5, #a8c4ff);
+    --info-surface:    light-dark(rgba(59, 111, 212, 0.10), rgba(127, 168, 255, 0.13));
+    --info-line:       light-dark(rgba(59, 111, 212, 0.28), rgba(127, 168, 255, 0.30));
+
+    --neutral-surface: light-dark(rgba(18, 21, 28, 0.05), rgba(242, 245, 249, 0.06));
+    --neutral-line:    light-dark(rgba(18, 21, 28, 0.14), rgba(242, 245, 249, 0.14));
+    --neutral-text:    var(--text-muted);
+
+    /*
+     |------------------------------------------------------------------
+     | Typography
+     |------------------------------------------------------------------
+     | With no imagery, type is the composition. The scale has real jumps
+     | in it -- the old build topped out at 30px for an h1, which is a
+     | large part of why every page read flat.
+     */
+    --font-display: "Bricolage Grotesque", "Space Grotesk", var(--font-sans);
+    --font-sans: "Inter", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    --font-mono: "SFMono-Regular", "Consolas", "Liberation Mono", monospace;
+
+    --text-2xs:  0.6875rem;  /* 11 */
+    --text-xs:   0.75rem;    /* 12 */
+    --text-sm:   0.875rem;   /* 14 */
+    --text-base: 1rem;       /* 16 -- marketplace baseline */
+    --text-md:   1.0625rem;  /* 17 */
+    --text-lg:   1.25rem;    /* 20 */
+    --text-xl:   1.5rem;     /* 24 */
+    --text-2xl:  1.875rem;   /* 30 */
+    --text-3xl:  2.25rem;    /* 36 */
+    --text-4xl:  3rem;       /* 48 */
+    --text-5xl:  4rem;       /* 64 */
+    --text-6xl:  5.25rem;    /* 84 -- landing display only */
+
+    --leading-none: 1;
+    --leading-tight: 1.12;
+    --leading-snug: 1.35;
+    --leading-normal: 1.6;
+
+    --tracking-tight: -0.03em;
+    --tracking-snug: -0.015em;
+    --tracking-wide: 0.08em;
+
+    --weight-normal: 400;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --weight-bold: 700;
+    --weight-extrabold: 800;
+
+    /* ---- Spacing (4px base) ----------------------------------------- */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    --space-20: 5rem;
+    --space-24: 6rem;
+    --space-32: 8rem;
+
+    /*
+     |------------------------------------------------------------------
+     | Radii
+     |------------------------------------------------------------------
+     | Softer than the old 8px-everywhere, but the real fix for "too
+     | sharp" is the painted-line geometry, not rounder corners. Ribbons
+     | and ticket stubs stay deliberately square-edged.
+     */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+    --radius-2xl: 32px;
+    --radius-pill: 999px;
+
+    /*
+     |------------------------------------------------------------------
+     | Elevation
+     |------------------------------------------------------------------
+     | Light-theme shadows are warm and tinted, not black -- pure black
+     | over warm paper reads as dirt. Dark-theme shadows go deeper,
+     | because a soft shadow is invisible at night.
+     */
+    --shadow-xs: light-dark(
+        0 1px 2px rgba(72, 60, 40, 0.06),
+        0 1px 2px rgba(0, 0, 0, 0.4));
+    --shadow-sm: light-dark(
+        0 2px 6px rgba(72, 60, 40, 0.08), 0 1px 2px rgba(72, 60, 40, 0.05),
+        0 2px 8px rgba(0, 0, 0, 0.45));
+    --shadow-md: light-dark(
+        0 8px 24px rgba(72, 60, 40, 0.10), 0 2px 6px rgba(72, 60, 40, 0.06),
+        0 10px 28px rgba(0, 0, 0, 0.5));
+    --shadow-lg: light-dark(
+        0 24px 56px rgba(72, 60, 40, 0.14), 0 6px 16px rgba(72, 60, 40, 0.08),
+        0 24px 60px rgba(0, 0, 0, 0.6));
+
+    /* The floodlight actually throwing light. Used only where something
+       is genuinely "on": primary CTA hover, the live now-marker. */
+    --glow-accent: 0 0 0 1px var(--accent-line), 0 6px 28px rgba(255, 178, 36, 0.34);
+    --glow-open: 0 0 20px rgba(79, 224, 172, 0.34);
+
+    --ring-accent: 0 0 0 3px light-dark(rgba(255, 178, 36, 0.38), rgba(255, 178, 36, 0.30));
+    --ring-danger: 0 0 0 3px light-dark(rgba(220, 43, 62, 0.26), rgba(255, 84, 104, 0.28));
+
+    /*
+     |------------------------------------------------------------------
+     | Layout
+     |------------------------------------------------------------------
+     | Fluid, not fixed. V1 targets desktop (NFR-7), but "desktop" is not
+     | one width -- the old build hardcoded 1280px and left a dead gutter
+     | on every larger screen.
+     */
+    --container-width: 1440px;
+    --container-narrow: 1040px;
+    --gutter: var(--space-8);
+    --topbar-height: 68px;
+    --sidebar-width: 244px;
+
+    /*
+     |------------------------------------------------------------------
+     | Motion
+     |------------------------------------------------------------------
+     | Durations carry meaning: instant for press, base for state change,
+     | slow for entrances. The spring is real overshoot -- the old build
+     | declared one and never used it, which is why nothing felt alive.
+     */
+    --duration-instant: 90ms;
+    --duration-fast: 160ms;
+    --duration-base: 240ms;
+    --duration-slow: 400ms;
+    --duration-slower: 640ms;
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-snap: cubic-bezier(0.2, 0.9, 0.25, 1);
+    --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+    --transition-fast: var(--duration-fast) var(--ease-snap);
+    --transition-base: var(--duration-base) var(--ease-out);
+    --transition-slow: var(--duration-slow) var(--ease-out);
+
+    /* ---- Z-index ----------------------------------------------------- */
+    --z-base: 1;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-overlay: 800;
+    --z-modal: 900;
+    --z-toast: 1000;
+}
+
+/* Explicit user choice overrides the OS. theme.js writes this attribute,
+   and an inline script in <head> applies it before first paint. */
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"]  { color-scheme: dark; }
+
+/*
+ |----------------------------------------------------------------------
+ | Console scope -- Owner & Admin back-office
+ |----------------------------------------------------------------------
+ | Same palette, quieter delivery. These are tools opened dozens of times
+ | a day, not a browsing experience: the type drops to a dense 14px
+ | baseline, radii tighten, and amber is reserved for genuinely primary
+ | actions. Linear/Stripe density, not marketplace energy.
+ */
+.console-shell {
+    --text-base: 0.875rem;
+    --text-md: 0.9375rem;
+    --text-lg: 1.0625rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+
+    --gutter: var(--space-6);
+    --surface-page: light-dark(#f4f2ed, #04060a);
+    --surface-card: light-dark(#ffffff, #0c1017);
+}
+
+/*
+ |----------------------------------------------------------------------
+ | Legacy aliases
+ |----------------------------------------------------------------------
+ | A handful of Blade views still reference pre-redesign names inline.
+ | These keep them rendering correctly until those views are rebuilt in
+ | Phases 3-5, at which point this block gets deleted. Do not add to it.
+ */
+:root {
+    --color-brand-400: var(--accent-hover);
+    --color-brand-500: var(--accent);
+    --color-accent-500: var(--accent);
+    --color-magenta-500: var(--danger);
+    --color-gray-400: var(--text-muted);
+    --color-ink-400: var(--text-muted);
+    --color-ink-500: var(--line-strong);
+    --border-color: var(--line);
+    --border-color-strong: var(--line-strong);
+    --color-danger-solid: var(--danger);
+    --color-danger-border: var(--danger-line);
+    --color-success-solid: var(--success);
+    --color-warning-solid: var(--warning);
+    --color-warning-border: var(--warning-line);
+    --color-info-solid: var(--info);
+}

@@ -1,0 +1,57 @@
+/*
+ |----------------------------------------------------------------------
+ | Theme toggle
+ |----------------------------------------------------------------------
+ | A three-segment control (system / light / dark). The active segment is
+ | marked by a solid painted block sliding behind the icon rather than by
+ | a colour swap -- it reads as a physical switch, and it is the same
+ | painted-block vocabulary the category rail and stepper use.
+ */
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-sunken);
+}
+
+.theme-toggle-option {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 26px;
+    border-radius: var(--radius-pill);
+    color: var(--text-muted);
+    line-height: 0;
+    transition: color var(--transition-fast),
+                background-color var(--transition-fast),
+                transform var(--duration-instant) var(--ease-spring);
+}
+
+.theme-toggle-option:hover {
+    color: var(--text-primary);
+}
+
+.theme-toggle-option:active {
+    transform: scale(0.88);
+}
+
+.theme-toggle-option.is-active {
+    background-color: var(--surface-raised);
+    color: var(--accent-text);
+    box-shadow: var(--shadow-xs);
+}
+
+.theme-toggle-option:focus-visible {
+    outline: none;
+    box-shadow: var(--ring-accent);
+}
+
+.theme-toggle.is-compact .theme-toggle-option {
+    width: 24px;
+    height: 22px;
+}

@@ -1,5 +1,5 @@
 <x-app-layout title="Booking {{ $reservation->reference }}">
-    <div class="container-narrow" style="padding-inline: 0;">
+    <div class="container-narrow">
         <x-ui.page-header :title="'Booking '.$reservation->reference">
             <x-slot:breadcrumb>
                 <a href="{{ route('home') }}" class="link-muted">Venues</a>
@@ -33,18 +33,12 @@
             </x-ui.alert>
         @endif
 
+        {{-- The booking as a ticket stub. Leads the page: it is what the
+             customer came back to this screen to look at. --}}
+        <x-ui.stub :reservation="$reservation" data-reveal style="margin-bottom: var(--space-6);" />
+
         <x-ui.card>
             <div class="stack-6">
-                @if ($reservation->isConfirmed() || $reservation->isPending())
-                    <div class="text-center stack-2">
-                        <p class="text-sm text-muted uppercase">Your reference</p>
-                        <div><span class="reference-code">{{ $reservation->reference }}</span></div>
-                        <p class="text-sm text-muted">Quote this at the venue</p>
-                    </div>
-
-                    <hr class="divider">
-                @endif
-
                 <dl class="detail-list">
                     <dt>Status</dt>
                     <dd>

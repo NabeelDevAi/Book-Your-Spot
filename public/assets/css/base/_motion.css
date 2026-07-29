@@ -1,0 +1,194 @@
+/*
+ |----------------------------------------------------------------------
+ | Motion
+ |----------------------------------------------------------------------
+ | Shared keyframes, the [data-reveal] entrance system, skeleton loaders,
+ | and the view-transition choreography. Components animate their own
+ | hover/press locally; this file holds only what is genuinely shared.
+ |
+ | Two rules the previous build broke:
+ |
+ |   1. Motion must have amplitude. A 1px hover lift is invisible -- it
+ |      costs a repaint and buys nothing. If a movement is worth doing it
+ |      is worth seeing: 3-6px, with a scale or shadow change alongside.
+ |
+ |   2. Motion must be optional. There was no prefers-reduced-motion
+ |      handling at all, which is an accessibility defect, not a polish
+ |      item. See the bottom of this file.
+ */
+
+/* ---- Keyframes ------------------------------------------------------ */
+
+@keyframes fade-slide-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes pop-in {
+    from { opacity: 0; transform: scale(0.92); }
+    to   { opacity: 1; transform: none; }
+}
+
+@keyframes shimmer {
+    from { background-position: -200% 0; }
+    to   { background-position: 200% 0; }
+}
+
+/* A slow breath on anything claiming to be live right now. */
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.55; transform: scale(0.86); }
+}
+
+/* Confirmation ring -- fires once when a slot is picked. */
+@keyframes ring-out {
+    from { box-shadow: 0 0 0 0 var(--accent-line); }
+    to   { box-shadow: 0 0 0 12px rgba(255, 178, 36, 0); }
+}
+
+/* The floodlight coming up on a board panel. */
+@keyframes light-up {
+    from { opacity: 0; transform: scaleX(0.4); }
+    to   { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes slide-in-right {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: none; }
+}
+
+/* ---- Scroll reveal --------------------------------------------------- */
+/*
+ | Elements only start hidden once JS has confirmed it can drive the
+ | reveal (.reveal-ready on <html>), so content is never stranded
+ | invisible if the module fails to load. Keep that guard.
+ */
+
+html.reveal-ready [data-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity var(--duration-slow) var(--ease-out),
+                transform var(--duration-slow) var(--ease-out);
+}
+
+html.reveal-ready [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+}
+
+/* Stagger children of a group. The ceiling matters: past ~8 items the
+   delay stops reading as choreography and starts reading as lag. */
+[data-reveal-group] > [data-reveal]:nth-child(1) { transition-delay: 0ms; }
+[data-reveal-group] > [data-reveal]:nth-child(2) { transition-delay: 55ms; }
+[data-reveal-group] > [data-reveal]:nth-child(3) { transition-delay: 110ms; }
+[data-reveal-group] > [data-reveal]:nth-child(4) { transition-delay: 165ms; }
+[data-reveal-group] > [data-reveal]:nth-child(5) { transition-delay: 220ms; }
+[data-reveal-group] > [data-reveal]:nth-child(6) { transition-delay: 275ms; }
+[data-reveal-group] > [data-reveal]:nth-child(7) { transition-delay: 330ms; }
+[data-reveal-group] > [data-reveal]:nth-child(n+8) { transition-delay: 360ms; }
+
+/* ---- Skeletons -------------------------------------------------------- */
+/*
+ | Defined and, in the previous build, never used anywhere. They get wired
+ | to the booking-form availability fetch, which is the one place in the
+ | product where the user genuinely waits on the network.
+ */
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--neutral-surface);
+    border-radius: var(--radius-md);
+    background-image: linear-gradient(
+        100deg,
+        transparent 30%,
+        var(--neutral-line) 50%,
+        transparent 70%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s var(--ease-in-out) infinite;
+}
+
+.skeleton-text {
+    height: 0.75em;
+    border-radius: var(--radius-sm);
+    margin-block: 0.25em;
+}
+
+.skeleton-text.is-short { width: 40%; }
+.skeleton-text.is-medium { width: 65%; }
+
+.skeleton-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-pill);
+}
+
+.skeleton-block { height: 100%; width: 100%; }
+
+/* ---- View transitions --------------------------------------------------- */
+/*
+ | Native cross-document transitions: a venue card morphs into the venue
+ | page hero rather than the page hard-cutting. Progressive enhancement --
+ | browsers without support simply navigate as they always did.
+ |
+ | Opted in per-navigation from motion.js, and the paired elements are
+ | matched by view-transition-name set in the venue card / venue hero.
+ */
+
+@view-transition { navigation: auto; }
+
+::view-transition-old(root) {
+    animation: fade-in var(--duration-fast) var(--ease-out) reverse;
+}
+
+::view-transition-new(root) {
+    animation: fade-in var(--duration-base) var(--ease-out);
+}
+
+/* Named pairs (the crest morph) animate on their own timing -- slower,
+   because it is the one movement the eye is meant to follow. */
+::view-transition-group(.venue-crest) {
+    animation-duration: var(--duration-slow);
+    animation-timing-function: var(--ease-out);
+}
+
+/* ---- Utility hooks -------------------------------------------------------- */
+
+.animate-in { animation: fade-slide-up var(--duration-slow) var(--ease-out) backwards; }
+.animate-pop { animation: pop-in var(--duration-base) var(--ease-spring) backwards; }
+
+/* Per-item entrance delay, set inline as --i on the element. */
+[style*="--i:"] { animation-delay: calc(var(--i) * 45ms); }
+
+/*
+ |----------------------------------------------------------------------
+ | Reduced motion
+ |----------------------------------------------------------------------
+ | Not a toggle that degrades the product -- everything stays fully
+ | usable and fully visible, it simply stops moving. Note the reveal
+ | override: without it, [data-reveal] elements would keep their opacity:0
+ | start state and the page would be blank.
+ */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    html.reveal-ready [data-reveal] {
+        opacity: 1;
+        transform: none;
+    }
+
+    @view-transition { navigation: none; }
+}

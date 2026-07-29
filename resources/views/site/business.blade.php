@@ -5,34 +5,51 @@
         <span>{{ $business->name }}</span>
     </div>
 
-    <div class="venue-gallery">
-        @forelse ($business->images as $image)
-            @break($loop->index >= 5)
-            <img src="{{ $image->url() }}" alt="{{ $business->name }}" loading="lazy">
-        @empty
-            <div class="venue-gallery-empty">
-                <x-ui.icon name="image" :size="28" />
-                <span class="text-sm">No photos yet</span>
+    {{--
+        Crest-led hero. The crest carries view-transition-name: venue-crest, and
+        so does the card that linked here -- so the browser pairs them and the
+        artwork morphs from tile to hero instead of the page hard-cutting.
+        Purely progressive: without support the navigation is exactly as before.
+
+        Real photos still win when a venue has uploaded any; the gallery below
+        the fold keeps the rest.
+    --}}
+    <header class="venue-hero">
+        <div class="venue-hero-media crest-frame">
+            @if ($business->images->isNotEmpty())
+                <img src="{{ $business->images->first()->url() }}" alt="{{ $business->name }}">
+            @else
+                <x-ui.crest :business="$business" morph />
+            @endif
+        </div>
+
+        <div class="venue-hero-body">
+            <div class="cluster-1" style="flex-wrap: wrap;">
+                @foreach ($business->businessGames as $businessGame)
+                    <span class="tag">{{ $businessGame->game->name }}</span>
+                @endforeach
             </div>
-        @endforelse
-    </div>
+
+            <h1 class="venue-hero-title">{{ $business->name }}</h1>
+
+            <div class="venue-hero-meta">
+                <span class="cluster-1"><x-ui.icon name="map-pin" :size="15" /> {{ $business->address }}, {{ $business->area }}</span>
+                <span class="cluster-1"><x-ui.icon name="phone" :size="15" /> {{ $business->contact_number }}</span>
+            </div>
+        </div>
+    </header>
+
+    @if ($business->images->count() > 1)
+        <div class="venue-gallery">
+            @foreach ($business->images->skip(1) as $image)
+                @break($loop->index >= 4)
+                <img src="{{ $image->url() }}" alt="{{ $business->name }}" loading="lazy">
+            @endforeach
+        </div>
+    @endif
 
     <div class="layout-with-aside">
         <div class="stack-6">
-            <div class="stack-2">
-                <h1 class="h1">{{ $business->name }}</h1>
-
-                <div class="cluster-4 text-muted">
-                    <span class="cluster-1"><x-ui.icon name="map-pin" :size="14" /> {{ $business->address }}, {{ $business->area }}</span>
-                    <span class="cluster-1"><x-ui.icon name="phone" :size="14" /> {{ $business->contact_number }}</span>
-                </div>
-
-                <div class="cluster-1" style="flex-wrap: wrap;">
-                    @foreach ($business->businessGames as $businessGame)
-                        <span class="tag">{{ $businessGame->game->name }}</span>
-                    @endforeach
-                </div>
-            </div>
 
             @if ($business->description)
                 <div class="prose"><p>{{ $business->description }}</p></div>
@@ -80,6 +97,20 @@
                                 @if ($spot->description)
                                     <div class="spot-row-meta">{{ $spot->description }}</div>
                                 @endif
+
+                                {{-- The day as a track. `open` is the free
+                                     windows, so lit means genuinely bookable
+                                     rather than merely "within opening hours"
+                                     -- the reading a customer actually wants.
+                                     The exact times stay listed underneath;
+                                     the ribbon is for scanning, not for
+                                     replacing the numbers. --}}
+                                <x-ui.ribbon
+                                    :day="$date"
+                                    :open="$windows"
+                                    density="standard"
+                                    class="spot-row-ribbon"
+                                />
 
                                 <div class="availability">
                                     @forelse ($windows as $window)

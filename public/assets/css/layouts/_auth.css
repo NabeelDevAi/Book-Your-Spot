@@ -1,0 +1,199 @@
+/*
+ |----------------------------------------------------------------------
+ | Auth screens (login, register, password)
+ |----------------------------------------------------------------------
+ | Split layout: form on the left, brand panel on the right. The panel
+ | is where we explain the two account types, since choosing between
+ | "book a spot" and "list my venue" is the first decision a visitor makes.
+ */
+
+.auth-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 520px;
+    min-height: 100vh;
+}
+
+.auth-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-10) var(--space-8);
+    background-color: var(--surface-page);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-card-wide {
+    max-width: 520px;
+}
+
+.auth-header {
+    margin-bottom: var(--space-6);
+}
+
+.auth-title {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: -0.015em;
+    line-height: var(--leading-tight);
+}
+
+.auth-subtitle {
+    margin-top: var(--space-2);
+    font-size: var(--text-base);
+    color: var(--text-muted);
+}
+
+.auth-footer {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border-color);
+    font-size: var(--text-base);
+    color: var(--text-muted);
+    text-align: center;
+}
+
+.auth-brand {
+    margin-bottom: var(--space-8);
+}
+
+/* ---- Brand panel ---------------------------------------------------------- */
+
+/*
+ | The brand panel is a board -- same floodlit surface as the search hero and
+ | the ticket stub, so a first-time visitor meets the product's vocabulary
+ | before they have seen a single venue.
+ |
+ | It previously had two symmetrical radial blobs in opposite corners. That is
+ | the decorative-gradient-blob pattern the brief explicitly rules out, and it
+ | carried no meaning: two light sources from nowhere, in a product about
+ | floodlit courts. The court grid and a single off-centre light replace it --
+ | see .board-lines / .board-lit in components/_board.css, which this reuses
+ | rather than redefining.
+ */
+.auth-aside {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-8);
+    padding: var(--space-12) var(--space-10);
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-aside > * {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-aside-title {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-extrabold);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+.auth-aside-text {
+    font-size: var(--text-md);
+    line-height: var(--leading-normal);
+    color: var(--text-secondary);
+    max-width: 40ch;
+}
+
+.auth-points {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.auth-point {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.auth-point-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    border-radius: var(--radius-md);
+    background-color: rgba(255, 178, 36, 0.12);
+    color: var(--accent);
+}
+
+.auth-point-title {
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-md);
+}
+
+.auth-point-text {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    line-height: var(--leading-snug);
+    margin-top: 2px;
+}
+
+/* ---- Account-type chooser (register) ---------------------------------------- */
+
+.role-choice {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+}
+
+.role-option {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border: 1px solid var(--border-color-strong);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-card);
+    cursor: pointer;
+    text-align: left;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast),
+                box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.role-option:hover {
+    border-color: var(--text-muted);
+    transform: translateY(-1px);
+}
+
+.role-option:has(input:checked) {
+    border-color: var(--accent);
+    background-color: rgba(255, 178, 36, 0.06);
+    box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.role-option input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.role-option-icon {
+    color: var(--accent);
+    line-height: 0;
+    margin-bottom: var(--space-1);
+}
+
+.role-option-title {
+    font-weight: var(--weight-semibold);
+    font-size: var(--text-md);
+}
+
+.role-option-text {
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    line-height: var(--leading-snug);
+}

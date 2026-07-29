@@ -8,7 +8,15 @@
     @if ($title || isset($actions))
         <div class="card-header">
             <div>
-                @if ($title)<h2 class="card-title">{{ $title }}</h2>@endif
+                {{-- `title` accepts either a plain string prop or a <x-slot:title>
+                     carrying markup (the booking steps pass a numbered badge).
+                     A slot must not be escaped or it prints its own tags; a
+                     string must be, since it can be venue-supplied. --}}
+                @if ($title)
+                    <h2 class="card-title">
+                        {!! $title instanceof \Illuminate\View\ComponentSlot ? $title : e($title) !!}
+                    </h2>
+                @endif
                 @if ($subtitle)<p class="card-subtitle">{{ $subtitle }}</p>@endif
             </div>
             @isset($actions)

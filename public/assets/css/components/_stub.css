@@ -1,0 +1,196 @@
+/*
+ |----------------------------------------------------------------------
+ | Ticket stub
+ |----------------------------------------------------------------------
+ | A reservation rendered as the physical object it stands for.
+ |
+ | The stub is a board (dark in both themes) because it is the artifact
+ | the customer holds up at a counter -- it should look the same to them
+ | every time, not restyle itself because their phone flipped to light
+ | mode at sunset.
+ |
+ | Perforation and notches are masks rather than images: no assets, no
+ | second request, and crisp at any zoom.
+ */
+
+.stub {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    background-color: var(--surface-board);
+    color: var(--text-on-board);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    box-shadow: var(--shadow-lg);
+
+    /* Board token rebasing -- see components/_board.css for why this is
+       done with custom properties rather than descendant selectors. */
+    --text-primary: var(--text-on-board);
+    --text-secondary: #b6c0d1;
+    --text-muted: var(--text-on-board-muted);
+    --line: rgba(242, 245, 249, 0.10);
+    --line-strong: rgba(242, 245, 249, 0.18);
+    --neutral-surface: rgba(242, 245, 249, 0.06);
+    --neutral-line: rgba(242, 245, 249, 0.14);
+    --accent-text: var(--accent-hover);
+}
+
+/* The lit edge: a status-coloured rule down the left, so the state is
+   readable before a single word is. */
+.stub::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 4px;
+    background-color: var(--stub-tone, var(--text-muted));
+}
+
+.stub.is-confirmed { --stub-tone: var(--success); }
+.stub.is-pending   { --stub-tone: var(--warning); }
+.stub.is-completed { --stub-tone: var(--info); }
+.stub.is-rejected,
+.stub.is-no_show   { --stub-tone: var(--danger); }
+.stub.is-expired,
+.stub.is-cancelled { --stub-tone: var(--text-muted); }
+
+/* ---- Main panel --------------------------------------------------- */
+
+.stub-main {
+    padding: var(--space-6) var(--space-6) var(--space-6) var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+.stub-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.stub-venue {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stub-spot {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: var(--tracking-snug);
+    line-height: var(--leading-tight);
+}
+
+.stub-when {
+    display: flex;
+    gap: var(--space-8);
+    flex-wrap: wrap;
+}
+
+.stub-when-part {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stub-when-label {
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+}
+
+.stub-when-value {
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---- Tear-off ------------------------------------------------------ */
+/*
+ | Separated by a perforation: a dashed rule plus two notches punched out
+ | of the edges, which is what actually sells it as a torn ticket. The
+ | notches are radial-gradient masks in the page's own colour, so they
+ | read as holes rather than as dots painted on.
+ */
+
+.stub-tear {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+    background-color: rgba(242, 245, 249, 0.03);
+    border-left: 2px dashed var(--line-strong);
+}
+
+.stub-tear::before,
+.stub-tear::after {
+    content: "";
+    position: absolute;
+    left: -11px;
+    width: 20px;
+    height: 20px;
+    border-radius: var(--radius-pill);
+    background-color: var(--surface-page);
+}
+
+.stub-tear::before { top: -10px; }
+.stub-tear::after { bottom: -10px; }
+
+.stub-tear-label,
+.stub-tear-note {
+    font-size: var(--text-2xs);
+    text-transform: uppercase;
+    letter-spacing: var(--tracking-wide);
+    color: var(--text-muted);
+}
+
+/*
+ | The reference. Largest type on the page by a distance, monospace and
+ | letter-spaced, because its entire job is to be read aloud across a
+ | counter or typed into a till by someone who has never seen it before.
+ */
+.stub-reference {
+    font-family: var(--font-mono);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    word-break: break-all;
+}
+
+/* A stub for a dead booking (expired, cancelled, rejected) should not
+   advertise a reference in live amber. */
+.stub.is-expired .stub-reference,
+.stub.is-cancelled .stub-reference,
+.stub.is-rejected .stub-reference,
+.stub.is-no_show .stub-reference {
+    color: var(--text-secondary);
+}
+
+.stub.is-expired,
+.stub.is-cancelled {
+    opacity: 0.82;
+}
+
+/* ---- Entrance ------------------------------------------------------- */
+/* Arrives with a slight spring -- this is the one screen in the product
+   worth a small flourish, because it is the moment the booking exists. */
+.stub[data-reveal] { will-change: transform; }
+
+html.reveal-ready [data-reveal].stub.is-revealed {
+    animation: pop-in var(--duration-slow) var(--ease-spring);
+}

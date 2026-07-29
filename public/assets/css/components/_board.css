@@ -1,0 +1,110 @@
+/*
+ |----------------------------------------------------------------------
+ | Board
+ |----------------------------------------------------------------------
+ | The floodlit panel. Dark in BOTH themes -- it is the scoreboard the
+ | product is built around, and a dark board sitting inside a light page
+ | is the signature the whole design rests on.
+ |
+ | The important part is not the background, it is that a board REDEFINES
+ | the semantic tokens for everything inside it. Drop any component into a
+ | board and it adapts on its own: no `.board .badge {}` overrides, no
+ | component needing to know where it was placed. Add a component later
+ | and it works in a board for free.
+ |
+ | This is why the token layer is semantic rather than literal. `--text-
+ | primary` means "the strongest text on whatever surface you are on",
+ | not "near-black" -- so it can be reassigned here and stay truthful.
+ */
+
+.board {
+    position: relative;
+    background-color: var(--surface-board);
+    color: var(--text-on-board);
+    isolation: isolate;
+
+    /* Text */
+    --text-primary: var(--text-on-board);
+    --text-secondary: #b6c0d1;
+    --text-muted: var(--text-on-board-muted);
+
+    /* Surfaces, re-based on the board rather than on the page */
+    --surface-card: #141a24;
+    --surface-raised: #1c2431;
+    --surface-sunken: #04050a;
+    --surface-overlay: #222b3a;
+
+    /* Lines are always light-on-dark here, whatever the page theme is */
+    --line: rgba(242, 245, 249, 0.10);
+    --line-strong: rgba(242, 245, 249, 0.18);
+    --line-paint: rgba(242, 245, 249, 0.26);
+    --neutral-surface: rgba(242, 245, 249, 0.06);
+    --neutral-line: rgba(242, 245, 249, 0.14);
+
+    /* Amber and mint are legible on dark, so the tinted-text variants can
+       go back to the bright end in both themes. */
+    --accent-text: var(--accent-hover);
+    --open-text: #4fe0ac;
+    --busy: var(--busy-on-board);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.45);
+    --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+
+/*
+ | Escape hatch: a genuinely light panel floating on a board. Restores the
+ | page-level tokens for its subtree, so a white card on a dark board reads
+ | correctly in light theme and in dark.
+ */
+.board .board-inset {
+    color: var(--text-primary);
+
+    --text-primary: light-dark(#12151c, #f2f5f9);
+    --text-secondary: light-dark(#4c5768, #a3aec2);
+    --text-muted: light-dark(#7a8698, #6f7b92);
+
+    --surface-card: light-dark(#ffffff, #0e1219);
+    --surface-raised: light-dark(#ffffff, #161b25);
+    --surface-sunken: light-dark(#edeae3, #04050a);
+
+    --line: light-dark(rgba(18, 21, 28, 0.10), rgba(242, 245, 249, 0.09));
+    --line-strong: light-dark(rgba(18, 21, 28, 0.18), rgba(242, 245, 249, 0.16));
+    --neutral-surface: light-dark(rgba(18, 21, 28, 0.05), rgba(242, 245, 249, 0.06));
+    --neutral-line: light-dark(rgba(18, 21, 28, 0.14), rgba(242, 245, 249, 0.14));
+
+    --accent-text: light-dark(#8f5400, #ffc658);
+    --open-text: light-dark(#07845f, #4fe0ac);
+}
+
+/*
+ | Court markings. A faint painted grid that gives the board a surface to
+ | be, rather than a flat black rectangle -- this is the texture doing the
+ | work the previous build's radial gradient blobs were doing badly.
+ */
+.board-lines::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image:
+        linear-gradient(to right, rgba(242, 245, 249, 0.045) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(242, 245, 249, 0.045) 1px, transparent 1px);
+    background-size: 96px 96px;
+    /* Fades out toward the edges so it reads as lighting, not as wallpaper. */
+    mask-image: radial-gradient(ellipse 90% 80% at 30% 0%, #000 20%, transparent 78%);
+}
+
+/* A single warm wash where the floodlight lands. One light source, off to
+   one side -- not a symmetrical pair of glows in opposite corners. */
+.board-lit::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background:
+        radial-gradient(ellipse 60% 70% at 12% -10%, rgba(255, 178, 36, 0.16), transparent 62%);
+}

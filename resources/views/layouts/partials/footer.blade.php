@@ -1,5 +1,5 @@
 <footer class="app-footer">
-    <div class="container app-footer-inner">
+    <div class="container-box app-footer-inner">
         <span>&copy; {{ now()->year }} BookYourSpot — Karachi</span>
 
         <div class="footer-links">

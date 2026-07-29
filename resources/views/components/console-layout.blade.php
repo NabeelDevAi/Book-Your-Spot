@@ -10,15 +10,16 @@
 --}}
 
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @themeAttribute>
 <head>
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>{{ $title ? $title.' — '.config('app.name') : config('app.name') }}</title>
 
     <link rel="icon" href="/favicon.ico" sizes="any">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <x-assets />
     @stack('head')
 </head>
 <body>
@@ -48,6 +49,7 @@
                 </div>
 
                 <div class="cluster-2 ml-auto">
+                    <x-ui.theme-toggle compact />
                     @include('layouts.partials.notification-bell')
                     @include('layouts.partials.user-menu')
                 </div>

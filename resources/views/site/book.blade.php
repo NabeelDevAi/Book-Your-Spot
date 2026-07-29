@@ -41,7 +41,11 @@
         @csrf
 
         <div class="stack-6">
-            <x-ui.card title="Choose a date">
+            <x-ui.card>
+                <x-slot:title>
+                    <span class="step"><span class="step-number">1</span> Choose a date</span>
+                </x-slot:title>
+
                 <div class="date-strip">
                     @foreach ($dateOptions as $option)
                         <label class="date-chip {{ $option->isSameDay($date) ? 'is-active' : '' }}">
@@ -59,26 +63,56 @@
                         </label>
                     @endforeach
                 </div>
+
+                {{-- The chosen day as a board: what is already gone, and what
+                     is left. Everything below is choosing within this. --}}
+                <div class="board board-lines booking-board" style="margin-top: var(--space-5);">
+                    <x-ui.ribbon :day="$date" :open="$freeWindows" density="tall" scale />
+
+                    <div class="ribbon-legend" style="margin-top: var(--space-3);">
+                        <span><span class="ribbon-legend-swatch"></span> Free</span>
+                        <span><span class="ribbon-legend-swatch is-busy"></span> Taken or closed</span>
+                    </div>
+                </div>
             </x-ui.card>
 
             <x-ui.card
-                title="How long?"
                 subtitle="This spot is booked in {{ \App\Support\Money::duration($spot->price_unit_minutes) }} blocks."
             >
+                <x-slot:title>
+                    <span class="step"><span class="step-number">2</span> How long?</span>
+                </x-slot:title>
+
                 {{-- Only durations the spot actually sells are offered, so
-                     SRS 9.7 can't be violated from the UI at all. --}}
-                <x-ui.field label="Booking length" name="duration_minutes">
-                    <x-ui.select name="duration_minutes" data-duration>
-                        @foreach ($durations as $option)
-                            <option value="{{ $option }}" @selected($option === $duration)>
-                                {{ \App\Support\Money::duration($option) }}
-                            </option>
-                        @endforeach
-                    </x-ui.select>
-                </x-ui.field>
+                     SRS 9.7 can't be violated from the UI at all.
+
+                     A hidden input behind a segmented control: the form field
+                     is unchanged, so validation, old() and the slot refetch in
+                     booking-form.js all work exactly as they did with a
+                     <select>. See public/assets/js/segmented.js. --}}
+                <input type="hidden" name="duration_minutes" id="duration-input"
+                       value="{{ $duration }}" data-duration>
+
+                <div class="segmented" data-segmented="#duration-input"
+                     role="radiogroup" aria-label="Booking length">
+                    @foreach ($durations as $option)
+                        <button type="button"
+                                class="segmented-option {{ $option === $duration ? 'is-active' : '' }}"
+                                data-segmented-option="{{ $option }}"
+                                role="radio"
+                                aria-checked="{{ $option === $duration ? 'true' : 'false' }}"
+                                tabindex="{{ $option === $duration ? '0' : '-1' }}">
+                            {{ \App\Support\Money::duration($option) }}
+                        </button>
+                    @endforeach
+                </div>
             </x-ui.card>
 
-            <x-ui.card title="Pick a start time">
+            <x-ui.card>
+                <x-slot:title>
+                    <span class="step"><span class="step-number">3</span> Pick a start time</span>
+                </x-slot:title>
+
                 @error('start_datetime')
                     <x-ui.alert variant="danger" style="margin-bottom: var(--space-4);">{{ $message }}</x-ui.alert>
                 @enderror

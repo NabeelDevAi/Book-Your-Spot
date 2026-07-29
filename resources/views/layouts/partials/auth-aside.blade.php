@@ -1,4 +1,4 @@
-<aside class="auth-aside">
+<aside class="auth-aside board board-lines board-lit">
     <div class="stack-3">
         <h2 class="auth-aside-title">Find a spot.<br>Book it in a minute.</h2>
         <p class="auth-aside-text">

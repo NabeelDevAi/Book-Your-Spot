@@ -1,0 +1,154 @@
+/*
+ |----------------------------------------------------------------------
+ | Charts
+ |----------------------------------------------------------------------
+ | Hand-rolled inline SVG and CSS bars. No charting library: the whole of
+ | SRS section 8 is bar charts and one trend line, and pulling in a
+ | 200 kB dependency for that would be the wrong trade on a desktop-only
+ | pilot with a strict no-framework brief.
+ */
+
+/* ---- Horizontal bars ---------------------------------------------------- */
+
+.chart-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.chart-bar-row {
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr) 56px;
+    gap: var(--space-3);
+    align-items: center;
+}
+
+.chart-bar-label {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.chart-bar-track {
+    height: 20px;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-sunken);
+    overflow: hidden;
+}
+
+.chart-bar-fill {
+    display: block;
+    height: 100%;
+    border-radius: var(--radius-sm);
+    background-color: var(--accent);
+    transition: width var(--transition-slow) var(--ease-out);
+}
+
+.chart-bar-value {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+/* ---- Trend line ---------------------------------------------------------- */
+
+.chart-line {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.chart-line-svg {
+    width: 100%;
+    height: 180px;
+    display: block;
+    overflow: visible;
+}
+
+.chart-axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.chart-legend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-color);
+}
+
+.chart-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.chart-legend-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+/* ---- Status distribution strip --------------------------------------------- */
+
+.status-strip {
+    display: flex;
+    height: 28px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--surface-sunken);
+}
+
+.status-strip-segment {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: var(--weight-semibold);
+    color: var(--surface-board);
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    transition: width var(--transition-slow) var(--ease-out);
+}
+
+.status-strip-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    font-size: var(--text-xs);
+}
+
+.status-strip-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--text-secondary);
+}
+
+/* ---- Quality table cues ------------------------------------------------------ */
+
+.rate {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 2px;
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--weight-semibold);
+}
+
+/* A high rejection or unanswered rate is the fraud/quality signal the SRS asks
+   for, so it is coloured rather than left as an anonymous number. */
+.rate.is-poor { color: var(--danger-text); }
+.rate.is-watch { color: var(--warning-text); }
+.rate.is-good { color: var(--success-text); }

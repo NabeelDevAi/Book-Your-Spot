@@ -1,0 +1,221 @@
+/*
+ |----------------------------------------------------------------------
+ | Availability ribbon
+ |----------------------------------------------------------------------
+ | The product's signature component. A day as a single 24-hour track:
+ | bare = closed, lit = open, shadow = taken, marker = now.
+ |
+ | Every rule here is theme-agnostic because the tokens do that work --
+ | dropped inside a .board the whole thing rebases automatically.
+ |
+ | Positions arrive as inline left/width percentages from App\Support\
+ | Ribbon. Nothing in this file knows about hours, and nothing in the PHP
+ | knows about pixels.
+ */
+
+.ribbon {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+}
+
+.ribbon-body {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.ribbon-track {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-sunken);
+    /* Deliberately square-ish: this is a measuring instrument, and a pill
+       shape would make the ends read as rounded time. */
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* ---- Segments --------------------------------------------------------- */
+
+.ribbon-open,
+.ribbon-busy {
+    position: absolute;
+    inset-block: 0;
+    /* Scale in from the left as the ribbon reveals -- time filling up. */
+    transform-origin: left center;
+}
+
+.ribbon-open {
+    background-color: var(--open-surface);
+    box-shadow: inset 0 0 0 1px var(--open-line);
+}
+
+.ribbon-busy {
+    background-color: var(--busy);
+}
+
+/* An owner's own block, hatched so it never reads as a paid booking. */
+.ribbon-busy.is-block {
+    background-color: transparent;
+    background-image: repeating-linear-gradient(
+        -45deg,
+        var(--busy) 0 3px,
+        transparent 3px 7px
+    );
+}
+
+/* ---- Now marker -------------------------------------------------------- */
+/*
+ | The one genuinely "live" thing on the page, so it is the one place the
+ | floodlight glow is spent outside a primary CTA.
+ */
+.ribbon-now {
+    position: absolute;
+    inset-block: -1px;
+    width: 2px;
+    margin-left: -1px;
+    background-color: var(--accent);
+    box-shadow: 0 0 8px rgba(255, 178, 36, 0.75);
+    z-index: 2;
+    pointer-events: none;
+}
+
+.ribbon-now::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    margin-left: -3px;
+    border-radius: var(--radius-pill);
+    background-color: var(--accent);
+    animation: pulse-dot 2.4s var(--ease-in-out) infinite;
+}
+
+/* ---- Labels & scale ----------------------------------------------------- */
+
+.ribbon-label {
+    flex: 0 0 auto;
+    width: 148px;
+    min-width: 0;
+}
+
+.ribbon-label-name {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ribbon-label-meta {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ribbon-scale {
+    position: relative;
+    height: 16px;
+    margin-top: var(--space-1);
+}
+
+.ribbon-scale-mark {
+    position: absolute;
+    top: 0;
+    transform: translateX(-50%);
+    font-size: var(--text-2xs);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+/* Edge marks would otherwise hang off both ends of the track. */
+.ribbon-scale-mark:first-child { transform: none; }
+.ribbon-scale-mark:last-child { transform: translateX(-100%); }
+
+/* ---- Densities ----------------------------------------------------------- */
+
+.ribbon.is-micro .ribbon-track { height: 6px; border-radius: var(--radius-pill); }
+.ribbon.is-micro .ribbon-open,
+.ribbon.is-micro .ribbon-busy { border-radius: 0; }
+
+.ribbon.is-standard .ribbon-track { height: 12px; }
+
+.ribbon.is-tall .ribbon-track { height: 48px; }
+
+.ribbon.is-dense .ribbon-track { height: 20px; }
+.ribbon.is-dense + .ribbon.is-dense { margin-top: var(--space-2); }
+
+/* ---- Entrance ------------------------------------------------------------ */
+/*
+ | Segments wipe in from the left when the ribbon first appears. Staggered
+ | by index so a stack of spots fills in as a sequence rather than all at
+ | once -- the one moment this component is allowed to show off.
+ */
+html.reveal-ready [data-reveal] .ribbon-open,
+html.reveal-ready [data-reveal] .ribbon-busy {
+    transform: scaleX(0);
+    transition: transform var(--duration-slow) var(--ease-out);
+}
+
+html.reveal-ready [data-reveal].is-revealed .ribbon-open,
+html.reveal-ready [data-reveal].is-revealed .ribbon-busy {
+    transform: scaleX(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html.reveal-ready [data-reveal] .ribbon-open,
+    html.reveal-ready [data-reveal] .ribbon-busy {
+        transform: none;
+    }
+}
+
+/* ---- Legend --------------------------------------------------------------- */
+
+.ribbon-legend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-size: var(--text-xs);
+    color: var(--text-muted);
+}
+
+.ribbon-legend > span {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.ribbon-legend-swatch {
+    width: 14px;
+    height: 8px;
+    border-radius: 2px;
+    background-color: var(--open-surface);
+    box-shadow: inset 0 0 0 1px var(--open-line);
+}
+
+.ribbon-legend-swatch.is-busy {
+    background-color: var(--busy);
+    box-shadow: none;
+}
+
+.ribbon-legend-swatch.is-block {
+    background-color: transparent;
+    background-image: repeating-linear-gradient(-45deg, var(--busy) 0 3px, transparent 3px 7px);
+    box-shadow: none;
+}
+
+/* Breathing room where a ribbon sits between a spot's meta line and its
+   listed free windows. */
+.spot-row-ribbon {
+    margin-block: var(--space-3) var(--space-2);
+}
