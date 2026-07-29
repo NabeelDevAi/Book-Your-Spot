@@ -33,6 +33,19 @@ class PricingCalculator
         return round($this->units($spot, $durationMinutes) * (float) $spot->price_amount, 2);
     }
 
+    /**
+     * The same total in paisa, computed without floats.
+     *
+     * The rate is converted to an integer first and multiplied by an integer
+     * unit count, so no rounding occurs at any point. `total()` above rounds a
+     * float product and is fine for display, but the wallet ledger has to sum
+     * exactly -- this is the figure that gets held, captured and refunded.
+     */
+    public function totalMinor(Spot $spot, int $durationMinutes): int
+    {
+        return Money::toMinor($spot->price_amount) * $this->units($spot, $durationMinutes);
+    }
+
     public function units(Spot $spot, int $durationMinutes): int
     {
         return (int) ceil($durationMinutes / $spot->price_unit_minutes);

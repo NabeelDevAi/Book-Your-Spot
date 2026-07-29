@@ -4,8 +4,13 @@ namespace Database\Factories;
 
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
+use App\Enums\WalletTransactionType;
 use App\Models\User;
+use App\Models\Wallet;
+use App\Models\WalletTransaction;
+use App\Services\Wallet\WalletService;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -40,6 +45,115 @@ class UserFactory extends Factory
             'no_show_count' => 0,
             'must_change_password' => false,
         ];
+    }
+
+    /**
+     * Customers are created with money in their wallet.
+     *
+     * From Phase 3 onward a booking is paid from wallet balance at request
+     * time, so a customer with an empty wallet cannot book at all. Making a
+     * funded wallet the default reflects that: a test about operating hours or
+     * duration rules should not have to plumb a top-up first.
+     *
+     * The credit is written through the ledger rather than straight onto the
+     * balance column, so the reconciliation invariant holds for factory-made
+     * users exactly as it does for real ones.
+     *
+     * Tests that care about the money itself opt out with `broke()` or set
+     * their own figure with `withWalletBalance()`.
+     */
+    /** The default balance every factory-made customer starts with: Rs 50,000. */
+    public const DEFAULT_WALLET_MINOR = 5_000_000;
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            if (! $user->role->canBook()) {
+                return;
+            }
+
+            $this->creditWallet($user, self::DEFAULT_WALLET_MINOR);
+        });
+    }
+
+    /**
+     * A customer with no wallet at all.
+     *
+     * Implemented by undoing the default rather than by suppressing it, because
+     * Laravel binds an `afterCreating` closure to the factory instance that
+     * registered it and copies the callback array by reference into every
+     * derived instance. A flag on `$this` read inside the default closure would
+     * therefore read the ORIGINAL factory's value and silently never apply --
+     * and a test helper that quietly does nothing is worse than no helper.
+     *
+     * Deleting the ledger rows first is required: wallet_transactions restricts
+     * deletion of its wallet. Safe here because a factory wallet has exactly
+     * one row and no holds.
+     */
+    public function broke(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $wallet = Wallet::where('user_id', $user->id)->first();
+
+            if ($wallet === null) {
+                return;
+            }
+
+            WalletTransaction::where('wallet_id', $wallet->id)->delete();
+            $wallet->delete();
+        });
+    }
+
+    /** A customer with an exact balance, credited through the ledger. */
+    public function withWalletBalance(int $minor): static
+    {
+        return $this->afterCreating(function (User $user) use ($minor) {
+            $wallet = Wallet::where('user_id', $user->id)->first();
+
+            if ($wallet === null) {
+                $this->creditWallet($user, $minor);
+
+                return;
+            }
+
+            $delta = $minor - $wallet->balance_minor;
+
+            if ($delta === 0) {
+                return;
+            }
+
+            DB::transaction(function () use ($user, $delta) {
+                $wallets = app(WalletService::class);
+                $locked = $wallets->lock($user);
+
+                $delta > 0
+                    ? $wallets->credit($locked, $delta, WalletTransactionType::Topup)
+                    : $wallets->debit($locked, -$delta, WalletTransactionType::AdminAdjustment);
+            });
+        });
+    }
+
+    /**
+     * Credit through WalletService rather than writing the balance column, so
+     * the reconciliation invariant holds for factory users exactly as it does
+     * for real ones.
+     */
+    private function creditWallet(User $user, int $minor): void
+    {
+        if ($minor <= 0) {
+            return;
+        }
+
+        DB::transaction(function () use ($user, $minor) {
+            $wallets = app(WalletService::class);
+
+            $wallets->credit(
+                $wallets->lock($user),
+                $minor,
+                WalletTransactionType::Topup,
+                ['meta' => ['source' => 'factory']],
+            );
+        });
     }
 
     public function owner(): static

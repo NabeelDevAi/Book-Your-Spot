@@ -1,0 +1,151 @@
+/* ============================================================
+   Wallet
+   ============================================================
+   The balance is the one number that decides whether a customer can book at
+   all, so it gets more visual weight than a normal stat tile and sits in the
+   nav as well as on its own page.
+   ============================================================ */
+
+.wallet-summary {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-4);
+}
+
+/* The available figure leads; total balance is context, not the headline. */
+.wallet-summary .stat:first-child .stat-value {
+    font-size: var(--text-3xl);
+    color: var(--color-accent);
+}
+
+/* ---- Nav chip ------------------------------------------------------ */
+
+.wallet-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--weight-medium);
+
+    padding-inline: var(--space-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full, 999px);
+}
+
+.wallet-chip:hover {
+    border-color: var(--color-accent);
+}
+
+.wallet-chip.is-active {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+/* ---- Payment element ----------------------------------------------- */
+
+/* The gateway renders into this host in an iframe. Reserving height stops the
+   form jumping when it mounts, which otherwise pushes the pay button under the
+   cursor mid-click. */
+#topup-payment-element:not([hidden]) {
+    min-height: 15rem;
+    padding-top: var(--space-2);
+}
+
+@media (max-width: 40rem) {
+    .wallet-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ---- Booking form: cancellation policy ----------------------------- */
+
+/* Collapsed by default. The terms must be readable before paying, but they
+   should not push the pay button below the fold to achieve it. */
+.booking-policy {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+}
+
+.booking-policy summary {
+    cursor: pointer;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-medium);
+    color: var(--color-text-muted);
+}
+
+.booking-policy summary:hover {
+    color: var(--color-text);
+}
+
+.booking-policy ul {
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-4);
+
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    line-height: 1.7;
+}
+
+/* ---- Owner earnings ------------------------------------------------ */
+
+/* Available and clearing get equal weight. Burying the clearing figure is how
+   an owner ends up thinking money has gone missing. */
+.earnings-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+}
+
+.payout-account {
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.payout-account:last-of-type {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+/* ---- Admin: payout details ----------------------------------------- */
+
+/* Read straight off the screen and typed into a banking app, so the account
+   number is monospaced and the labels stay out of the way. */
+.payout-detail {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+    gap: var(--space-1) var(--space-4);
+    margin: 0;
+}
+
+.payout-detail dt {
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-text-muted);
+}
+
+.payout-detail dd {
+    margin: 0;
+    font-size: var(--text-sm);
+}
+
+/* ---- Treasury ------------------------------------------------------ */
+
+.treasury-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--space-4);
+}
+
+/* Total liability is the number that has to be backed by cash. */
+.treasury-grid .stat:first-child .stat-value {
+    font-size: var(--text-3xl);
+}
+
+@media (max-width: 60rem) {
+    .earnings-summary {
+        grid-template-columns: 1fr;
+    }
+}

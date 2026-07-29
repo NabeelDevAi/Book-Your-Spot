@@ -61,6 +61,11 @@ class ConcurrentApprovalTest extends TestCase
     {
         DB::table('audit_logs')->delete();
         DB::table('notifications')->delete();
+        // Wallet rows first: holds and ledger entries reference reservations
+        // and wallets, and wallet_transactions restricts deletion of its wallet.
+        DB::table('wallet_holds')->delete();
+        DB::table('wallet_transactions')->delete();
+        DB::table('wallets')->delete();
         DB::table('reservations')->delete();
         DB::table('spot_blocks')->delete();
         DB::table('spots')->delete();

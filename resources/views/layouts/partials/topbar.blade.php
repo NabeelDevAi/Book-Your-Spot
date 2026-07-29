@@ -15,6 +15,16 @@
                        class="nav-link {{ request()->routeIs('bookings.*') ? 'is-active' : '' }}">
                         My bookings
                     </a>
+
+                    {{-- Balance sits in the nav because it decides whether a
+                         booking can be made at all. Burying it a click away
+                         means finding out at the moment of paying. Shows the
+                         AVAILABLE figure -- held funds are already committed. --}}
+                    <a href="{{ route('wallet.show') }}"
+                       class="nav-link wallet-chip {{ request()->routeIs('wallet.*') ? 'is-active' : '' }}">
+                        <x-ui.icon name="wallet" :size="15" />
+                        {{ \App\Support\Money::pkrMinor(auth()->user()->walletAvailableMinor()) }}
+                    </a>
                 @elseif (auth()->user()->isOwner())
                     <a href="{{ route('owner.dashboard') }}" class="nav-link">Owner console</a>
                 @elseif (auth()->user()->isAdmin())

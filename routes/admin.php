@@ -7,7 +7,9 @@ use App\Http\Controllers\Admin\GameController;
 use App\Http\Controllers\Admin\PasswordResetRequestController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReservationController;
+use App\Http\Controllers\Admin\TreasuryController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\WithdrawalController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,6 +45,26 @@ Route::middleware(['auth', 'role:admin'])
             Route::post('reinstate', [BusinessController::class, 'reinstate'])->name('reinstate');
             Route::post('clear-duplicate', [BusinessController::class, 'clearDuplicateFlag'])->name('clear-duplicate');
         });
+
+        /*
+        | Money (Phases 6 and 7).
+        |
+        | The withdrawal queue is a work list -- each row is a bank transfer
+        | somebody has to make by hand. Treasury is oversight: the float
+        | position, reconciliation, and the levers for putting one wallet right.
+        */
+        Route::get('withdrawals', [WithdrawalController::class, 'index'])->name('withdrawals.index');
+        Route::post('withdrawals/{withdrawal}/approve', [WithdrawalController::class, 'approve'])->name('withdrawals.approve');
+        Route::post('withdrawals/{withdrawal}/paid', [WithdrawalController::class, 'markPaid'])->name('withdrawals.paid');
+        Route::post('withdrawals/{withdrawal}/reject', [WithdrawalController::class, 'reject'])->name('withdrawals.reject');
+
+        Route::get('treasury', [TreasuryController::class, 'index'])->name('treasury.index');
+        Route::get('treasury/wallets/{user}', [TreasuryController::class, 'wallet'])->name('treasury.wallet');
+        Route::post('treasury/wallets/{user}/adjust', [TreasuryController::class, 'adjust'])->name('treasury.adjust');
+        Route::post('treasury/wallets/{user}/freeze', [TreasuryController::class, 'freeze'])->name('treasury.freeze');
+        Route::post('treasury/wallets/{user}/unfreeze', [TreasuryController::class, 'unfreeze'])->name('treasury.unfreeze');
+        Route::post('treasury/topups/{topup}/refund', [TreasuryController::class, 'refundTopup'])->name('treasury.refund');
+        Route::post('treasury/topups/{topup}/chargeback', [TreasuryController::class, 'chargeback'])->name('treasury.chargeback');
 
         // FR-3.3 -- the master category list.
         Route::get('games', [GameController::class, 'index'])->name('games.index');

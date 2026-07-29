@@ -60,7 +60,13 @@
 
                             <div class="text-right stack-2">
                                 <div class="h4">{{ $booking->totalPriceLabel() }}</div>
-                                <div class="text-xs text-muted">Paid at the venue</div>
+
+                                {{-- Held vs paid is the distinction that matters
+                                     to a customer looking at their balance and
+                                     wondering where the money went. --}}
+                                <div class="text-xs text-muted">
+                                    {{ $booking->hasActiveHold() ? 'Held from your wallet' : 'Paid from your wallet' }}
+                                </div>
 
                                 {{-- FR-4.9: always available while the booking is live.
                                      A late cancellation is allowed but flagged -- there
@@ -96,6 +102,7 @@
                                     <th>Spot</th>
                                     <th>When</th>
                                     <th class="cell-numeric">Price</th>
+                                    <th class="cell-numeric">Refunded</th>
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -117,6 +124,18 @@
                                             <div class="cell-secondary">{{ $booking->timeRangeLabel() }}</div>
                                         </td>
                                         <td class="cell-numeric">{{ $booking->totalPriceLabel() }}</td>
+
+                                        {{-- "Where did my money go" is the most
+                                             common support question a refund
+                                             policy generates. Answer it here. --}}
+                                        <td class="cell-numeric">
+                                            @if ($booking->wasRefunded())
+                                                <span class="text-success">{{ $booking->refundLabel() }}</span>
+                                            @elseif ($booking->refund_amount_minor !== null)
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </td>
+
                                         <td>
                                             <x-ui.badge :status="$booking->status->value">
                                                 {{ $booking->status->label() }}

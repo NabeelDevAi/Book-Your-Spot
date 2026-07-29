@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Contracts\PaymentGateway;
 use App\Models\User;
+use App\Services\Payment\SimulatedGateway;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
@@ -20,7 +22,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Payments are simulated for now -- see SimulatedGateway for exactly
+        // what is and is not pretend. Resolved through the interface
+        // everywhere, so introducing a real provider is a new class and this
+        // one line, not a change to the top-up flow. Tests bind a fake here
+        // for the same reason.
+        $this->app->singleton(PaymentGateway::class, fn () => new SimulatedGateway);
     }
 
     /**
@@ -128,5 +135,15 @@ class AppServiceProvider extends ServiceProvider
         // already limits speculation. This is a defence against scripted
         // submission, not against enthusiasm.
         RateLimiter::for('booking', fn (Request $request) => Limit::perMinute(10)->by($request->user()?->id ?: $request->ip()));
+
+        // Every top-up attempt creates a PaymentIntent at the gateway, so an
+        // unthrottled endpoint is a way to run up someone else's API bill and
+        // to card-test against our account. Tighter than booking for that
+        // reason: nobody legitimately tops up five times a minute.
+        RateLimiter::for('topup', fn (Request $request) => Limit::perMinute(5)->by($request->user()?->id ?: $request->ip()));
+
+        // Withdrawals are settled by hand, so a burst of requests is somebody
+        // else's afternoon. Nobody legitimately cashes out repeatedly.
+        RateLimiter::for('withdrawal', fn (Request $request) => Limit::perHour(10)->by($request->user()?->id ?: $request->ip()));
     }
 }

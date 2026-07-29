@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Support\Money;
 use Illuminate\Validation\ValidationException;
 use RuntimeException;
 
@@ -119,6 +120,38 @@ class BookingException extends RuntimeException
     public static function duplicateRequest(): self
     {
         return new self('You already have a request for this spot at that time.');
+    }
+
+    /**
+     * Bookings are paid in full from wallet balance, so the money has to be
+     * there first.
+     *
+     * The message names the exact shortfall and the field is `amount` rather
+     * than `start_datetime`, so the form points at the wallet rather than at a
+     * time picker that is perfectly fine.
+     */
+    public static function insufficientFunds(int $requiredMinor, int $availableMinor): self
+    {
+        $shortfall = $requiredMinor - $availableMinor;
+
+        return new self(
+            sprintf(
+                'This booking costs %s but your wallet has %s available. Top up %s to continue.',
+                Money::pkrMinor($requiredMinor),
+                Money::pkrMinor($availableMinor),
+                Money::pkrMinor($shortfall),
+            ),
+            field: 'amount',
+            suggestions: ['shortfall_minor' => $shortfall],
+        );
+    }
+
+    public static function walletFrozen(): self
+    {
+        return new self(
+            'Your wallet is on hold while a payment issue is reviewed, so bookings are paused. Please contact support.',
+            field: 'amount',
+        );
     }
 
     public static function notPending(): self

@@ -6,6 +6,7 @@ use App\Exceptions\BookingException;
 use App\Models\Reservation;
 use App\Models\Spot;
 use App\Models\User;
+use App\Services\Wallet\WalletService;
 use App\Support\Money;
 use Illuminate\Support\Carbon;
 
@@ -23,7 +24,11 @@ use Illuminate\Support\Carbon;
  */
 class BookingValidator
 {
-    public function __construct(private readonly AvailabilityService $availability) {}
+    public function __construct(
+        private readonly AvailabilityService $availability,
+        private readonly PricingCalculator $pricing,
+        private readonly WalletService $wallets,
+    ) {}
 
     /**
      * @throws BookingException
@@ -42,6 +47,11 @@ class BookingValidator
         $this->assertSlotIsFree($spot, $start, $end);
         $this->assertNoDuplicateRequest($spot, $user, $start, $end);
         $this->assertUnderPendingCap($user);
+
+        // Last, deliberately. A customer whose booking is invalid for some
+        // other reason should hear about that first -- being told to top up and
+        // then discovering the slot was never bookable is the worse order.
+        $this->assertCanAfford($spot, $user, $durationMinutes);
     }
 
     /** SRS 9.14 -- owners never book, not even at venues they don't own. */
@@ -185,6 +195,34 @@ class BookingValidator
 
         if ($user->reservations()->pending()->count() >= $cap) {
             throw BookingException::tooManyPending($cap);
+        }
+    }
+
+    /**
+     * The booking is paid in full from wallet balance at request time, so the
+     * money has to be there before the request is made.
+     *
+     * Checks AVAILABLE balance, not total: funds already held against another
+     * pending request are spoken for. Without that distinction a customer with
+     * Rs 1,000 could hold three Rs 800 bookings and the third capture would
+     * fail at approval time, which is far worse -- the Owner has already said
+     * yes and turned other customers away.
+     *
+     * The hold in ReservationService re-checks this under a row lock. This
+     * check exists to produce a good message and to fail before anything is
+     * written; that one is the actual guarantee.
+     */
+    private function assertCanAfford(Spot $spot, User $user, int $durationMinutes): void
+    {
+        $required = $this->pricing->totalMinor($spot, $durationMinutes);
+        $wallet = $this->wallets->for($user);
+
+        if ($wallet->isFrozen()) {
+            throw BookingException::walletFrozen();
+        }
+
+        if (! $wallet->hasAvailable($required)) {
+            throw BookingException::insufficientFunds($required, $wallet->availableMinor());
         }
     }
 

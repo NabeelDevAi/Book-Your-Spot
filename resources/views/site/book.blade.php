@@ -172,10 +172,23 @@
                 <div class="booking-total">
                     <div>
                         <div class="text-sm text-muted">Total</div>
-                        <div class="booking-total-note">Paid at the venue</div>
+                        <div class="booking-total-note">Held from your wallet now</div>
                     </div>
                     <div class="booking-total-value" data-total>{{ \App\Support\Money::pkr($total) }}</div>
                 </div>
+
+                {{-- The refund terms are shown BEFORE paying, not discovered at
+                     the moment of cancelling. These are the same tiers that get
+                     snapshotted onto the reservation on submit. --}}
+                <details class="booking-policy">
+                    <summary>Cancellation policy</summary>
+                    <ul>
+                        @foreach (app(\App\Services\Booking\RefundResolver::class)->describe() as $line)
+                            <li>{{ $line }}</li>
+                        @endforeach
+                        <li>If the venue cancels, or doesn't reply in time, you get a full refund.</li>
+                    </ul>
+                </details>
 
                 <div style="margin-top: var(--space-5);">
                     @guest
@@ -192,13 +205,32 @@
                         </p>
                     @else
                         @if (auth()->user()->isUser())
-                            <x-ui.button type="submit" variant="primary" block data-submit>
-                                Send request
-                            </x-ui.button>
+                            @php($availableMinor = auth()->user()->walletAvailableMinor())
+                            @php($shortfallMinor = \App\Support\Money::toMinor((string) $total) - $availableMinor)
 
-                            <p class="text-sm text-muted" style="margin-top: var(--space-3);">
-                                Nothing is charged now. The venue confirms your request, then you pay when you arrive.
-                            </p>
+                            {{-- Tell them before they submit, not after. The
+                                 server refuses either way, but a form that
+                                 rejects you on submit for a reason it already
+                                 knew is just rude. --}}
+                            @if ($shortfallMinor > 0)
+                                <x-ui.alert variant="warning" :icon="false" style="margin-bottom: var(--space-3);">
+                                    You have {{ \App\Support\Money::pkrMinor($availableMinor) }} available.
+                                    Top up {{ \App\Support\Money::pkrMinor($shortfallMinor) }} to book this slot.
+                                </x-ui.alert>
+
+                                <x-ui.button :href="route('wallet.show')" variant="primary" block icon="wallet">
+                                    Top up wallet
+                                </x-ui.button>
+                            @else
+                                <x-ui.button type="submit" variant="primary" block data-submit>
+                                    Send request
+                                </x-ui.button>
+
+                                <p class="text-sm text-muted" style="margin-top: var(--space-3);">
+                                    We hold {{ \App\Support\Money::pkr($total) }} from your wallet while the venue
+                                    replies. If they decline or don't answer, it's released straight back.
+                                </p>
+                            @endif
                         @else
                             <x-ui.button variant="secondary" block disabled>Owner accounts can't book</x-ui.button>
                         @endif

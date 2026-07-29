@@ -47,6 +47,7 @@
 @import "./components/_venue.css";
 @import "./components/_notifications.css";
 @import "./components/_chart.css";
+@import "./components/_wallet.css";
 
 /* ---- Layouts ------------------------------------------------------- */
 @import "./layouts/_app.css";
