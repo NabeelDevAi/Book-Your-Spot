@@ -249,13 +249,17 @@ class AvailabilityService
      * times on a table billed in 10-minute blocks would produce a useless list
      * and fragment the day into unsellable gaps.
      *
+     * @param  int|null  $leadMinutes  Minutes of required notice before the earliest offered
+     *                                 start. Defaults to the platform's customer-facing lead
+     *                                 time; an Owner recording a walk-in passes 0 so "right
+     *                                 now" is offered.
      * @return list<Carbon>
      */
-    public function startTimesFor(Spot $spot, Carbon $date, int $durationMinutes, ?Carbon $now = null): array
+    public function startTimesFor(Spot $spot, Carbon $date, int $durationMinutes, ?Carbon $now = null, ?int $leadMinutes = null): array
     {
         $now ??= Carbon::now();
         $step = $spot->price_unit_minutes;
-        $earliest = $now->copy()->addMinutes((int) config('booking.min_booking_lead_minutes'));
+        $earliest = $now->copy()->addMinutes($leadMinutes ?? (int) config('booking.min_booking_lead_minutes'));
 
         $starts = [];
 

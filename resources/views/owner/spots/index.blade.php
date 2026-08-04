@@ -94,6 +94,13 @@
                                             </td>
                                             <td class="cell-actions">
                                                 <div class="btn-group">
+                                                    @if ($spot->isActive())
+                                                        <x-ui.button
+                                                            :href="route('owner.businesses.spots.reservations.create', [$business, $spot])"
+                                                            variant="secondary" size="sm" icon="plus"
+                                                        >New booking</x-ui.button>
+                                                    @endif
+
                                                     <x-ui.button
                                                         :href="route('owner.businesses.spots.blocks.index', [$business, $spot])"
                                                         variant="ghost" size="sm" icon="calendar"

@@ -75,7 +75,7 @@
                                             <td>{{ $booking->spot->name }}</td>
                                             <td>
                                                 <a href="{{ route('owner.reservations.show', $booking) }}" class="link">
-                                                    {{ $booking->user->name }}
+                                                    {{ $booking->customerDisplayName() }}
                                                 </a>
                                             </td>
                                             <td>

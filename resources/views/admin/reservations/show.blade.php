@@ -17,15 +17,23 @@
                 <dl class="detail-list">
                     <dt>Customer</dt>
                     <dd>
-                        <a href="{{ route('admin.users.show', $reservation->user) }}" class="link">
-                            {{ $reservation->user->name }}
-                        </a>
-                        <div class="text-sm text-muted">
-                            {{ $reservation->user->email }} · {{ $reservation->user->phone }}
-                            @if ($reservation->user->no_show_count > 0)
-                                · {{ $reservation->user->no_show_count }} no-shows on record
-                            @endif
-                        </div>
+                        @if ($reservation->user)
+                            <a href="{{ route('admin.users.show', $reservation->user) }}" class="link">
+                                {{ $reservation->user->name }}
+                            </a>
+                            <div class="text-sm text-muted">
+                                {{ $reservation->user->email }} · {{ $reservation->user->phone }}
+                                @if ($reservation->user->no_show_count > 0)
+                                    · {{ $reservation->user->no_show_count }} no-shows on record
+                                @endif
+                            </div>
+                        @else
+                            {{ $reservation->customerDisplayName() }}
+                            <div class="text-sm text-muted">
+                                {{ $reservation->customerDisplayPhone() }} ·
+                                {{ $reservation->channel->label() }} booking, no platform account
+                            </div>
+                        @endif
                     </dd>
 
                     <dt>Venue</dt>

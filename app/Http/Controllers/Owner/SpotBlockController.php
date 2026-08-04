@@ -66,7 +66,7 @@ class SpotBlockController extends Controller
                 ))
                 ->with('pending_block_conflicts', $clashing->map(fn ($r) => [
                     'reference' => $r->reference,
-                    'customer' => $r->user->name,
+                    'customer' => $r->customerDisplayName(),
                     'when' => $r->dateLabel().' '.$r->timeRangeLabel(),
                 ])->all());
         }

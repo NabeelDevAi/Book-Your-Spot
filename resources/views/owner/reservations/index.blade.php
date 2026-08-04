@@ -4,6 +4,14 @@
         description="Every request and confirmed booking across your venues."
     >
         <x-slot:actions>
+            {{-- A walk-in or phone booking is entered against a specific spot,
+                 so this goes to the spot list rather than a form directly. --}}
+            <x-ui.button
+                :href="route($businesses->count() === 1 ? 'owner.businesses.spots.index' : 'owner.businesses.index', $businesses->count() === 1 ? $businesses->first() : [])"
+                variant="secondary"
+                icon="plus"
+            >New booking</x-ui.button>
+
             @if ($pendingCount > 0)
                 <x-ui.button
                     :href="route('owner.reservations.index', ['status' => 'pending'])"
@@ -95,11 +103,16 @@
                                 </td>
 
                                 <td>
-                                    <div class="cell-primary">{{ $reservation->user->name }}</div>
+                                    <div class="cell-primary">
+                                        {{ $reservation->customerDisplayName() }}
+                                        @if ($reservation->isManual())
+                                            <x-ui.badge variant="neutral">{{ $reservation->channel->label() }}</x-ui.badge>
+                                        @endif
+                                    </div>
                                     <div class="cell-secondary">
-                                        {{ $reservation->user->phone }}
+                                        {{ $reservation->customerDisplayPhone() }}
                                         {{-- SRS 9.12: surfaced right where the decision is made. --}}
-                                        @if ($reservation->user->no_show_count > 0)
+                                        @if ($reservation->user && $reservation->user->no_show_count > 0)
                                             <x-ui.badge :variant="$reservation->user->isRepeatNoShow() ? 'danger' : 'warning'">
                                                 {{ $reservation->user->no_show_count }} no-show{{ $reservation->user->no_show_count === 1 ? '' : 's' }}
                                             </x-ui.badge>

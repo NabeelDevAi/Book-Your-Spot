@@ -47,6 +47,49 @@ class BookingValidator
         $this->assertUnderPendingCap($user);
     }
 
+    /**
+     * The subset of the rules above that still apply when the Owner records a
+     * walk-in or phone booking on the customer's behalf.
+     *
+     * Deliberately skips assertUserMayBook (there may be no User account),
+     * assertNoDuplicateRequest and assertUnderPendingCap (both exist to stop a
+     * customer gaming the request queue, which does not apply to the venue's
+     * own staff), and the platform's minimum-lead-time rule -- a walk-in is
+     * standing at the counter, so "starting now" must be bookable.
+     *
+     * @throws BookingException
+     */
+    public function validateManual(Spot $spot, Carbon $start, int $durationMinutes): void
+    {
+        $this->assertSpotIsBookable($spot);
+        $this->assertDurationIsValid($spot, $durationMinutes);
+
+        $end = $start->copy()->addMinutes($durationMinutes);
+
+        $this->assertManualTimingIsSane($start, $end);
+        $this->assertWithinOperatingHours($spot, $start, $end);
+        $this->assertNotBlocked($spot, $start, $end);
+        $this->assertSlotIsFree($spot, $start, $end);
+    }
+
+    /**
+     * A manual booking is entered as it happens, so a start time a few
+     * minutes ago -- the customer is already at the table -- is fine. Only a
+     * booking that has already finished, or one absurdly far out, is rejected.
+     */
+    private function assertManualTimingIsSane(Carbon $start, Carbon $end): void
+    {
+        if ($end->isPast()) {
+            throw BookingException::inThePast();
+        }
+
+        $maxDays = (int) config('booking.max_advance_days');
+
+        if ($start->greaterThan(Carbon::now()->addDays($maxDays))) {
+            throw BookingException::tooFarAhead($maxDays);
+        }
+    }
+
     /** SRS 9.14 -- owners never book, not even at venues they don't own. */
     private function assertUserMayBook(User $user): void
     {

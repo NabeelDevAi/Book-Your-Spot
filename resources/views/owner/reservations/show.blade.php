@@ -7,6 +7,9 @@
         </x-slot:breadcrumb>
 
         <x-slot:actions>
+            @if ($reservation->isManual())
+                <x-ui.badge variant="neutral">{{ $reservation->channel->label() }}</x-ui.badge>
+            @endif
             <x-ui.badge :status="$reservation->status->value">{{ $reservation->status->label() }}</x-ui.badge>
         </x-slot:actions>
     </x-ui.page-header>
@@ -23,11 +26,11 @@
         {{-- SRS 9.12: without payments this record is the only deterrent, so it
              appears at the exact moment the owner decides. --}}
         <x-ui.alert
-            :variant="$reservation->user->isRepeatNoShow() ? 'danger' : 'warning'"
+            :variant="$reservation->user?->isRepeatNoShow() ? 'danger' : 'warning'"
             title="This customer has {{ $customerNoShows }} recorded no-show{{ $customerNoShows === 1 ? '' : 's' }}"
             style="margin-bottom: var(--space-5);"
         >
-            @if ($reservation->user->isRepeatNoShow())
+            @if ($reservation->user?->isRepeatNoShow())
                 They have failed to turn up more than once. Consider calling to confirm before approving.
             @else
                 They have missed a booking before.
@@ -98,19 +101,24 @@
 
             <x-ui.card title="Customer">
                 <dl class="detail-list">
-                    <dt>Name</dt><dd>{{ $reservation->user->name }}</dd>
-                    <dt>Phone</dt><dd>{{ $reservation->user->phone }}</dd>
-                    <dt>Email</dt><dd>{{ $reservation->user->email }}</dd>
-                    <dt>No-shows</dt>
-                    <dd>
-                        @if ($customerNoShows > 0)
-                            <x-ui.badge :variant="$reservation->user->isRepeatNoShow() ? 'danger' : 'warning'">
-                                {{ $customerNoShows }}
-                            </x-ui.badge>
-                        @else
-                            None on record
-                        @endif
-                    </dd>
+                    <dt>Name</dt><dd>{{ $reservation->customerDisplayName() }}</dd>
+                    <dt>Phone</dt><dd>{{ $reservation->customerDisplayPhone() ?? '—' }}</dd>
+                    @if ($reservation->user)
+                        <dt>Email</dt><dd>{{ $reservation->user->email }}</dd>
+                        <dt>No-shows</dt>
+                        <dd>
+                            @if ($customerNoShows > 0)
+                                <x-ui.badge :variant="$reservation->user->isRepeatNoShow() ? 'danger' : 'warning'">
+                                    {{ $customerNoShows }}
+                                </x-ui.badge>
+                            @else
+                                None on record
+                            @endif
+                        </dd>
+                    @else
+                        <dt>Account</dt>
+                        <dd>No platform account — recorded by staff as a {{ strtolower($reservation->channel->label()) }} booking.</dd>
+                    @endif
                 </dl>
             </x-ui.card>
         </div>
@@ -170,7 +178,7 @@
 
     {{-- SRS 9.19: one-click reasons so owners aren't forced to write an essay,
          with optional free text so the customer still gets context. --}}
-    <x-ui.modal id="reject-booking" title="Decline this request" subtitle="{{ $reservation->user->name }} will be notified with the reason you pick.">
+    <x-ui.modal id="reject-booking" title="Decline this request" subtitle="{{ $reservation->customerDisplayName() }} will be notified with the reason you pick.">
         <form method="POST" action="{{ route('owner.reservations.reject', $reservation) }}" class="form" id="reject-form">
             @csrf
 

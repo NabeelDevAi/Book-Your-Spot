@@ -32,7 +32,9 @@ class SendBookingReminders extends Command
             ->get();
 
         foreach ($due as $reservation) {
-            $reservation->user->notify(new ReservationReminder($reservation));
+            // A walk-in or phone booking with no linked account has nobody to
+            // remind -- the venue is the one who took it in the first place.
+            $reservation->user?->notify(new ReservationReminder($reservation));
             $reservation->business->owner->notify(new ReservationReminder($reservation));
 
             $reservation->forceFill(['reminder_sent_at' => now()])->save();

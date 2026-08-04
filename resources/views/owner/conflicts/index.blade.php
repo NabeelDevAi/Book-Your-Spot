@@ -46,8 +46,8 @@
                                 </td>
 
                                 <td>
-                                    <div class="cell-primary">{{ $reservation->user->name }}</div>
-                                    <div class="cell-secondary">{{ $reservation->user->phone }}</div>
+                                    <div class="cell-primary">{{ $reservation->customerDisplayName() }}</div>
+                                    <div class="cell-secondary">{{ $reservation->customerDisplayPhone() }}</div>
                                 </td>
 
                                 <td>
@@ -98,14 +98,14 @@
         <x-ui.modal
             id="resolve-{{ $conflict->id }}"
             title="How was this resolved?"
-            subtitle="{{ $conflict->reservation->reference }} — {{ $conflict->reservation->user->name }}, {{ $conflict->reservation->dateLabel() }}"
+            subtitle="{{ $conflict->reservation->reference }} — {{ $conflict->reservation->customerDisplayName() }}, {{ $conflict->reservation->dateLabel() }}"
         >
             <form method="POST" action="{{ route('owner.conflicts.resolve', $conflict) }}" class="form" id="resolve-form-{{ $conflict->id }}">
                 @csrf
 
                 <x-ui.alert variant="neutral">
-                    Call {{ $conflict->reservation->user->name }} on
-                    <strong>{{ $conflict->reservation->user->phone }}</strong> before recording an outcome.
+                    Call {{ $conflict->reservation->customerDisplayName() }} on
+                    <strong>{{ $conflict->reservation->customerDisplayPhone() }}</strong> before recording an outcome.
                 </x-ui.alert>
 
                 <fieldset>

@@ -3,16 +3,23 @@
 namespace App\Http\Controllers\Owner;
 
 use App\Enums\RejectionReason;
+use App\Enums\ReservationChannel;
 use App\Enums\ReservationStatus;
 use App\Exceptions\BookingException;
 use App\Http\Controllers\Controller;
 use App\Models\Business;
 use App\Models\Reservation;
+use App\Models\Spot;
+use App\Services\Booking\AvailabilityService;
+use App\Services\Booking\PricingCalculator;
 use App\Services\Booking\ReservationService;
+use App\Support\Money;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rules\Enum;
 use Illuminate\View\View;
 
 /**
@@ -23,7 +30,11 @@ use Illuminate\View\View;
  */
 class ReservationController extends Controller
 {
-    public function __construct(private readonly ReservationService $reservations) {}
+    public function __construct(
+        private readonly ReservationService $reservations,
+        private readonly AvailabilityService $availability,
+        private readonly PricingCalculator $pricing,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -74,7 +85,8 @@ class ReservationController extends Controller
             'rejectionReasons' => RejectionReason::ownerSelectable(),
             // SRS 9.12: the customer's no-show record is shown at the moment of
             // decision -- without payments, this is the only deterrent there is.
-            'customerNoShows' => $reservation->user->no_show_count,
+            // No record is possible for a walk-in with no linked account.
+            'customerNoShows' => $reservation->user->no_show_count ?? 0,
         ]);
     }
 
@@ -153,6 +165,156 @@ class ReservationController extends Controller
         }
 
         return back()->with('success', 'Recorded as a no-show.');
+    }
+
+    /**
+     * The form for recording a walk-in or phone booking on the customer's
+     * behalf. Deliberately reuses the same board/segmented-control/slot-grid
+     * UI and the same JSON slots contract as the customer-facing booking
+     * form (Site\BookingController), just with a lead time of zero -- a
+     * walk-in standing at the counter needs "right now" to be offered.
+     */
+    public function create(Business $business, Spot $spot): View
+    {
+        $this->authorize('manage', $business);
+        abort_unless($spot->business_id === $business->id, 404);
+        abort_unless($spot->isBookable(), 404);
+
+        $date = Carbon::today();
+        $duration = $this->resolveDuration($spot, null);
+
+        return view('owner.reservations.create', [
+            'business' => $business,
+            'spot' => $spot,
+            'date' => $date,
+            'duration' => $duration,
+            'startTimes' => $this->availability->startTimesFor($spot, $date, $duration, leadMinutes: 0),
+            'freeWindows' => $this->availability->freeWindows($spot, $date),
+            'durations' => $spot->allowedDurations(),
+            'priceExplanation' => $this->pricing->explain($spot, $duration),
+            'total' => $this->pricing->total($spot, $duration),
+            'dateOptions' => $this->dateOptions(),
+            'channels' => ReservationChannel::manual(),
+        ]);
+    }
+
+    /** Live availability for the manual booking form, same contract as bookings.slots. */
+    public function slots(Request $request, Business $business, Spot $spot): JsonResponse
+    {
+        $this->authorize('manage', $business);
+        abort_unless($spot->business_id === $business->id, 404);
+        abort_unless($spot->isBookable(), 404);
+
+        $validated = $request->validate([
+            'date' => ['required', 'date'],
+            'duration' => ['required', 'integer'],
+        ]);
+
+        $date = $this->resolveDate($validated['date']);
+        $duration = $this->resolveDuration($spot, $validated['duration']);
+
+        return response()->json([
+            'duration' => $duration,
+            'total' => $this->pricing->total($spot, $duration),
+            'total_label' => Money::pkr($this->pricing->total($spot, $duration)),
+            'explanation' => $this->pricing->explain($spot, $duration),
+            'slots' => array_map(
+                fn (Carbon $start) => [
+                    'value' => $start->format('Y-m-d H:i'),
+                    'label' => $start->format('g:i A'),
+                    'ends' => $start->copy()->addMinutes($duration)->format('g:i A'),
+                ],
+                $this->availability->startTimesFor($spot, $date, $duration, leadMinutes: 0),
+            ),
+        ]);
+    }
+
+    public function store(Request $request, Business $business, Spot $spot): RedirectResponse
+    {
+        $this->authorize('manage', $business);
+        abort_unless($spot->business_id === $business->id, 404);
+
+        $validated = $request->validate([
+            'start_datetime' => ['required', 'date'],
+            'duration_minutes' => ['required', 'integer'],
+            'channel' => ['required', new Enum(ReservationChannel::class)],
+            'customer_name' => ['required', 'string', 'max:150'],
+            'customer_phone' => ['required', 'string', 'max:30'],
+            'note' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $channel = ReservationChannel::from($validated['channel']);
+
+        if (! in_array($channel, ReservationChannel::manual(), true)) {
+            return back()->withInput()->withErrors(['channel' => 'Choose how this booking was made.']);
+        }
+
+        try {
+            $reservation = $this->reservations->createManual(
+                $spot,
+                $request->user(),
+                Carbon::parse($validated['start_datetime']),
+                (int) $validated['duration_minutes'],
+                $channel,
+                $validated['customer_name'],
+                $validated['customer_phone'],
+                $validated['note'] ?? null,
+            );
+        } catch (BookingException $e) {
+            return back()->withInput()->withErrors([$e->field => $e->getMessage()]);
+        }
+
+        return redirect()
+            ->route('owner.reservations.show', $reservation)
+            ->with('success', 'Booking recorded and confirmed.');
+    }
+
+    private function resolveDate(?string $input): Carbon
+    {
+        $today = Carbon::today();
+
+        if (! $input) {
+            return $today;
+        }
+
+        try {
+            $date = Carbon::parse($input)->startOfDay();
+        } catch (\Throwable) {
+            return $today;
+        }
+
+        $latest = $today->copy()->addDays((int) config('booking.max_advance_days'));
+
+        return $date->betweenIncluded($today, $latest) ? $date : $today;
+    }
+
+    /** Snap an arbitrary input onto a duration this spot actually sells. */
+    private function resolveDuration(Spot $spot, mixed $input): int
+    {
+        $allowed = $spot->allowedDurations();
+        $requested = (int) $input;
+
+        if (in_array($requested, $allowed, true)) {
+            return $requested;
+        }
+
+        if (in_array(60, $allowed, true)) {
+            return 60;
+        }
+
+        return $allowed[0] ?? $spot->min_duration_minutes;
+    }
+
+    /** @return list<Carbon> */
+    private function dateOptions(): array
+    {
+        $days = [];
+
+        for ($i = 0; $i < 14; $i++) {
+            $days[] = Carbon::today()->addDays($i);
+        }
+
+        return $days;
     }
 
     private function spotsFor($businesses, ?int $businessId)

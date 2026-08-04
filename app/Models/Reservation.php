@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\RejectionReason;
+use App\Enums\ReservationChannel;
 use App\Enums\ReservationStatus;
 use App\Enums\UserRole;
 use App\Support\Money;
@@ -17,7 +18,7 @@ use Illuminate\Support\Str;
 
 #[Fillable([
     'spot_id', 'user_id', 'business_id', 'start_datetime', 'end_datetime',
-    'duration_minutes', 'customer_note',
+    'duration_minutes', 'customer_note', 'customer_name', 'customer_phone', 'channel',
 ])]
 class Reservation extends Model
 {
@@ -35,6 +36,7 @@ class Reservation extends Model
             'no_show_flagged_at' => 'datetime',
             'reminder_sent_at' => 'datetime',
             'status' => ReservationStatus::class,
+            'channel' => ReservationChannel::class,
             'rejection_reason_code' => RejectionReason::class,
             'cancelled_by_role' => UserRole::class,
             'price_amount_snapshot' => 'decimal:2',
@@ -136,6 +138,12 @@ class Reservation extends Model
         return $this->start_datetime->isPast();
     }
 
+    /** Recorded by the Owner rather than requested by the customer. */
+    public function isManual(): bool
+    {
+        return $this->channel !== ReservationChannel::Online;
+    }
+
     public function hasEnded(): bool
     {
         return $this->end_datetime->isPast();
@@ -187,6 +195,20 @@ class Reservation extends Model
     | Display
     |--------------------------------------------------------------------------
     */
+
+    /**
+     * A walk-in or phone booking may have no linked User account -- the Owner
+     * recorded whatever the customer gave them at the counter.
+     */
+    public function customerDisplayName(): string
+    {
+        return $this->user?->name ?? $this->customer_name ?? 'Walk-in customer';
+    }
+
+    public function customerDisplayPhone(): ?string
+    {
+        return $this->user?->phone ?? $this->customer_phone;
+    }
 
     public function timeRangeLabel(): string
     {

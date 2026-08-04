@@ -58,6 +58,8 @@ class AuditLogger
 
     public const RESERVATION_NO_SHOW = 'reservation.no_show';
 
+    public const RESERVATION_MANUAL_CREATED = 'reservation.manual_created';
+
     public const CONFLICT_RAISED = 'conflict.raised';
 
     public const CONFLICT_RESOLVED = 'conflict.resolved';

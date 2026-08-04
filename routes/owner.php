@@ -76,6 +76,11 @@ Route::middleware(['auth', 'role:owner'])
                 Route::get('blocks', [SpotBlockController::class, 'index'])->name('blocks.index');
                 Route::post('blocks', [SpotBlockController::class, 'store'])->name('blocks.store');
                 Route::delete('blocks/{block}', [SpotBlockController::class, 'destroy'])->name('blocks.destroy');
+
+                // Walk-in / phone bookings the Owner records on a customer's behalf.
+                Route::get('reservations/create', [ReservationController::class, 'create'])->name('reservations.create');
+                Route::get('reservations/slots', [ReservationController::class, 'slots'])->name('reservations.slots');
+                Route::post('reservations', [ReservationController::class, 'store'])->name('reservations.store');
             });
         });
     });

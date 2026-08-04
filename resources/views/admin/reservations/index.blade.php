@@ -82,10 +82,14 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <a href="{{ route('admin.users.show', $reservation->user) }}" class="link">
-                                        {{ $reservation->user->name }}
-                                    </a>
-                                    <div class="cell-secondary">{{ $reservation->user->phone }}</div>
+                                    @if ($reservation->user)
+                                        <a href="{{ route('admin.users.show', $reservation->user) }}" class="link">
+                                            {{ $reservation->user->name }}
+                                        </a>
+                                    @else
+                                        {{ $reservation->customerDisplayName() }}
+                                    @endif
+                                    <div class="cell-secondary">{{ $reservation->customerDisplayPhone() }}</div>
                                 </td>
                                 <td>
                                     <a href="{{ route('admin.businesses.show', $reservation->business) }}" class="link">

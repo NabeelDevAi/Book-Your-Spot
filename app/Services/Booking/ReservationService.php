@@ -3,6 +3,7 @@
 namespace App\Services\Booking;
 
 use App\Enums\RejectionReason;
+use App\Enums\ReservationChannel;
 use App\Enums\ReservationStatus;
 use App\Exceptions\BookingException;
 use App\Models\Reservation;
@@ -76,6 +77,95 @@ class ReservationService
 
         $reservation->load('spot', 'business.owner', 'user');
         $reservation->business->owner->notify(new ReservationRequested($reservation));
+
+        return $reservation;
+    }
+
+    /**
+     * The Owner records a walk-in or phone booking on the customer's behalf.
+     *
+     * Unlike request(), this goes straight to `confirmed` -- there is no one
+     * else who needs to approve it, the Owner IS the approval. It still takes
+     * the spot lock and re-checks availability under it, exactly like
+     * approve(), so a manual entry can never double-book a slot a customer's
+     * request just won a race for.
+     *
+     * A phone number that matches an existing customer account links the
+     * booking to it, so the customer sees it in their own history too, rather
+     * than recording the same regular as a stranger on every visit.
+     *
+     * @throws BookingException
+     */
+    public function createManual(
+        Spot $spot,
+        User $owner,
+        Carbon $start,
+        int $durationMinutes,
+        ReservationChannel $channel,
+        string $customerName,
+        string $customerPhone,
+        ?string $note = null,
+    ): Reservation {
+        $this->validator->validateManual($spot, $start, $durationMinutes);
+
+        $end = $start->copy()->addMinutes($durationMinutes);
+        $matchedUser = User::customers()->where('phone', $customerPhone)->first();
+
+        $reservation = DB::transaction(function () use (
+            $spot, $owner, $start, $end, $durationMinutes, $channel, $customerName, $customerPhone, $note, $matchedUser,
+        ) {
+            $lockedSpot = Spot::whereKey($spot->id)->with('business')->lockForUpdate()->firstOrFail();
+
+            if (! $lockedSpot->isBookable()) {
+                throw BookingException::notBookable();
+            }
+
+            if (! $this->availability->isFree($lockedSpot, $start, $end)) {
+                throw BookingException::slotTaken();
+            }
+
+            $reservation = new Reservation([
+                'spot_id' => $lockedSpot->id,
+                'user_id' => $matchedUser?->id,
+                'business_id' => $lockedSpot->business_id,
+                'start_datetime' => $start,
+                'end_datetime' => $end,
+                'duration_minutes' => $durationMinutes,
+                'customer_note' => $note,
+                // Not needed once linked to an account -- the account's own
+                // name and phone are the record from then on.
+                'customer_name' => $matchedUser ? null : $customerName,
+                'customer_phone' => $matchedUser ? null : $customerPhone,
+                'channel' => $channel,
+            ]);
+
+            $reservation->forceFill($this->pricing->snapshotFor($lockedSpot, $durationMinutes));
+
+            $reservation->forceFill([
+                'status' => ReservationStatus::Confirmed,
+                'requested_at' => now(),
+                'responded_at' => now(),
+                'responded_by' => $owner->id,
+            ]);
+
+            $reservation->save();
+
+            // A customer's own pending request for this exact slot is now
+            // moot -- the table just went to the walk-in standing at it.
+            $this->autoRejectCompeting($reservation, $owner);
+
+            $this->audit->log(
+                AuditLogger::RESERVATION_MANUAL_CREATED,
+                $reservation,
+                meta: ['reference' => $reservation->reference, 'channel' => $channel->value],
+                actor: $owner,
+            );
+
+            return $reservation;
+        });
+
+        $reservation->load('spot', 'business', 'user');
+        $reservation->user?->notify(new ReservationConfirmed($reservation));
 
         return $reservation;
     }
@@ -291,11 +381,12 @@ class ReservationService
             $cancelled->load('spot', 'business.owner', 'user');
 
             // Tell the other party, never the person who just clicked cancel.
+            // A walk-in with no linked account has nobody to tell.
             $recipient = $actor->id === $cancelled->user_id
                 ? $cancelled->business->owner
                 : $cancelled->user;
 
-            $recipient->notify(new ReservationCancelled($cancelled));
+            $recipient?->notify(new ReservationCancelled($cancelled));
         }
 
         return $cancelled;
@@ -388,8 +479,11 @@ class ReservationService
             ])->save();
 
             // Atomic increment, not read-modify-write: two owners flagging the
-            // same customer at once must not lose a count.
-            $fresh->user()->increment('no_show_count');
+            // same customer at once must not lose a count. A walk-in with no
+            // linked account has no record to increment.
+            if ($fresh->user_id) {
+                $fresh->user()->increment('no_show_count');
+            }
 
             $this->audit->log(
                 AuditLogger::RESERVATION_NO_SHOW,
@@ -402,7 +496,7 @@ class ReservationService
         });
 
         $flagged->load('spot', 'business', 'user');
-        $flagged->user->notify(new ReservationNoShow($flagged));
+        $flagged->user?->notify(new ReservationNoShow($flagged));
 
         return $flagged;
     }
