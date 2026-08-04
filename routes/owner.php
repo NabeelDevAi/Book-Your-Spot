@@ -4,7 +4,6 @@ use App\Http\Controllers\Owner\BusinessController;
 use App\Http\Controllers\Owner\ConflictController;
 use App\Http\Controllers\Owner\BusinessGameController;
 use App\Http\Controllers\Owner\DashboardController;
-use App\Http\Controllers\Owner\EarningsController;
 use App\Http\Controllers\Owner\ImageController;
 use App\Http\Controllers\Owner\ReservationController;
 use App\Http\Controllers\Owner\SpotBlockController;
@@ -33,16 +32,6 @@ Route::middleware(['auth', 'role:owner'])
         Route::post('reservations/{reservation}/reject', [ReservationController::class, 'reject'])->name('reservations.reject');
         Route::post('reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');
         Route::post('reservations/{reservation}/no-show', [ReservationController::class, 'noShow'])->name('reservations.no-show');
-
-        // Phase 5/6 -- earnings, bank details, and cashing out. The only route
-        // by which money leaves the platform.
-        Route::get('earnings', [EarningsController::class, 'index'])->name('earnings.index');
-        Route::post('earnings/accounts', [EarningsController::class, 'storeAccount'])->name('earnings.accounts.store');
-        Route::delete('earnings/accounts/{account}', [EarningsController::class, 'destroyAccount'])
-            ->name('earnings.accounts.destroy');
-        Route::post('earnings/withdraw', [EarningsController::class, 'requestWithdrawal'])
-            ->middleware('throttle:withdrawal')
-            ->name('earnings.withdraw');
 
         // SRS 9.6 -- bookings disrupted by a block or a deactivation.
         Route::get('conflicts', [ConflictController::class, 'index'])->name('conflicts.index');

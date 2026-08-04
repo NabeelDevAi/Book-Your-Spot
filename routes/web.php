@@ -3,7 +3,6 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\Site\BookingController;
-use App\Http\Controllers\Site\WalletController;
 use App\Http\Controllers\Site\BookingHistoryController;
 use App\Http\Controllers\Site\BusinessController;
 use App\Http\Controllers\Site\SearchController;
@@ -36,13 +35,6 @@ Route::get('/spots/{spot}/slots', [BookingController::class, 'slots'])->name('bo
 
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::view('/dashboard', 'dashboard')->name('dashboard');
-
-    // Wallet. Payments are simulated, so a top-up settles on submit -- there
-    // is no card form, no redirect out and no callback to wait for.
-    Route::get('/wallet', [WalletController::class, 'show'])->name('wallet.show');
-    Route::post('/wallet/topup', [WalletController::class, 'topup'])
-        ->middleware('throttle:topup')
-        ->name('wallet.topup');
 
     Route::post('/spots/{spot}/book', [BookingController::class, 'store'])
         ->middleware('throttle:booking')

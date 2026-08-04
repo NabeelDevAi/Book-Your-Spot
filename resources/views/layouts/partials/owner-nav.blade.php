@@ -26,11 +26,6 @@
         <x-ui.icon name="alert" :size="16" /> Clashes
         @if ($conflictCount > 0)<span class="counter">{{ $conflictCount }}</span>@endif
     </a>
-
-    <a href="{{ route('owner.earnings.index') }}"
-       class="sidebar-link {{ request()->routeIs('owner.earnings.*') ? 'is-active' : '' }}">
-        <x-ui.icon name="wallet" :size="16" /> Earnings
-    </a>
 </div>
 
 <div class="sidebar-section">

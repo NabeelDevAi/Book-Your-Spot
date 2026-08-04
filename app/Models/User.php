@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -61,36 +60,6 @@ class User extends Authenticatable
     public function auditLogs(): HasMany
     {
         return $this->hasMany(AuditLog::class, 'actor_id');
-    }
-
-    /**
-     * This account's money. Created on first touch by WalletService, so it may
-     * legitimately be null for an account that has never transacted -- read it
-     * through `WalletService::for()` rather than this relation when a wallet is
-     * actually required.
-     */
-    public function wallet(): HasOne
-    {
-        return $this->hasOne(Wallet::class);
-    }
-
-    /**
-     * Spendable balance in paisa, safe to call from a view.
-     *
-     * `loadMissing` rather than reading `$this->wallet` directly: the topbar
-     * renders this on every authenticated page, and an implicit lazy load there
-     * trips `preventLazyLoading()` in local and testing and costs a query per
-     * request in production. An explicit load is permitted by the guard and
-     * resolves once per request.
-     *
-     * Returns 0 for an account that has never transacted -- a wallet is created
-     * on first touch by WalletService, not at registration.
-     */
-    public function walletAvailableMinor(): int
-    {
-        $this->loadMissing('wallet');
-
-        return $this->wallet?->availableMinor() ?? 0;
     }
 
     /*

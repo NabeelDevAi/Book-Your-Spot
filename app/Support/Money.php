@@ -30,60 +30,6 @@ class Money
         return $withSymbol ? self::SYMBOL.' '.$formatted : $formatted;
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Minor units
-    |--------------------------------------------------------------------------
-    | Everything in the wallet ledger is an integer count of paisa. Floats are
-    | not permitted anywhere in the money path: 0.1 + 0.2 is not 0.3, and a
-    | ledger that cannot be summed exactly is not a ledger.
-    |
-    | Spot pricing keeps its decimal(10,2) column for display continuity, so
-    | these two helpers are the boundary between the two representations.
-    */
-
-    /**
-     * Rupees to paisa: "2500.00" -> 250000.
-     *
-     * Decimal strings -- which is what Eloquent hands back for a decimal column
-     * -- are parsed digit by digit rather than cast to float first, so the
-     * conversion is exact. Anything beyond two decimal places is truncated, not
-     * rounded; price_amount is decimal(10,2) so a third digit should never
-     * exist, and silently rounding one up would invent money.
-     */
-    public static function toMinor(int|float|string|null $rupees): int
-    {
-        if ($rupees === null) {
-            return 0;
-        }
-
-        if (is_int($rupees)) {
-            return $rupees * 100;
-        }
-
-        if (is_string($rupees) && preg_match('/^\s*(-?)(\d+)(?:\.(\d{0,2})\d*)?\s*$/', $rupees, $m) === 1) {
-            $paisa = str_pad($m[3] ?? '', 2, '0');
-
-            return ($m[1] === '-' ? -1 : 1) * ((int) $m[2] * 100 + (int) $paisa);
-        }
-
-        // Float input, or a string in some shape the pattern did not expect.
-        // Rounding is correct here because the value has already lost exactness.
-        return (int) round((float) $rupees * 100);
-    }
-
-    /** Paisa to rupees: 250000 -> 2500.0. For display and legacy decimal columns only. */
-    public static function fromMinor(int $paisa): float
-    {
-        return $paisa / 100;
-    }
-
-    /** Format paisa directly: 250000 -> "Rs. 2,500". */
-    public static function pkrMinor(?int $paisa, bool $withSymbol = true): string
-    {
-        return self::pkr(self::fromMinor($paisa ?? 0), $withSymbol);
-    }
-
     /**
      * Compact form for dense tables and stat tiles: 1250 -> "Rs. 1.3k".
      */

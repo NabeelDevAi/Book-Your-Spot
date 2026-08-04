@@ -62,29 +62,6 @@ class AuditLogger
 
     public const CONFLICT_RESOLVED = 'conflict.resolved';
 
-    // Money
-    public const WITHDRAWAL_REQUESTED = 'withdrawal.requested';
-
-    public const WITHDRAWAL_APPROVED = 'withdrawal.approved';
-
-    public const WITHDRAWAL_PAID = 'withdrawal.paid';
-
-    public const WITHDRAWAL_REJECTED = 'withdrawal.rejected';
-
-    public const WITHDRAWAL_FAILED = 'withdrawal.failed';
-
-    /**
-     * An Admin moving money by hand. Rarely used and always worth explaining,
-     * so the reason is mandatory at the call site.
-     */
-    public const WALLET_ADJUSTED = 'wallet.adjusted';
-
-    public const WALLET_FROZEN = 'wallet.frozen';
-
-    public const WALLET_UNFROZEN = 'wallet.unfrozen';
-
-    public const TOPUP_REFUNDED = 'topup.refunded';
-
     /**
      * Record an action against a target model.
      *

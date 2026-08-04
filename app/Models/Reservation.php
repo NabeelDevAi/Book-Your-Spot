@@ -42,11 +42,6 @@ class Reservation extends Model
             'duration_minutes' => 'integer',
             'price_unit_minutes_snapshot' => 'integer',
             'is_late_cancellation' => 'boolean',
-            'amount_paid_minor' => 'integer',
-            'refund_amount_minor' => 'integer',
-            'owner_settlement_minor' => 'integer',
-            'refund_policy_snapshot' => 'array',
-            'earnings_matured_at' => 'datetime',
         ];
     }
 
@@ -211,35 +206,6 @@ class Reservation extends Model
     public function durationLabel(): string
     {
         return Money::duration($this->duration_minutes);
-    }
-
-    /*
-    |--------------------------------------------------------------------------
-    | Money
-    |--------------------------------------------------------------------------
-    */
-
-    /** The paid figure, which is authoritative over the decimal `total_price`. */
-    public function amountPaidLabel(): string
-    {
-        return Money::pkrMinor($this->amount_paid_minor ?? 0);
-    }
-
-    public function refundLabel(): string
-    {
-        return Money::pkrMinor($this->refund_amount_minor ?? 0);
-    }
-
-    /** True while the money is reserved but not yet the venue's. */
-    public function hasActiveHold(): bool
-    {
-        return $this->status === ReservationStatus::Pending && ($this->amount_paid_minor ?? 0) > 0;
-    }
-
-    /** Whether the customer got anything back when this booking ended. */
-    public function wasRefunded(): bool
-    {
-        return ($this->refund_amount_minor ?? 0) > 0;
     }
 
     public function getRouteKeyName(): string

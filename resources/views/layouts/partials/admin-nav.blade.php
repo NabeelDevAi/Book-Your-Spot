@@ -2,7 +2,6 @@
     $pendingBusinesses = \App\Models\Business::where('status', \App\Enums\BusinessStatus::PendingReview)->count();
     $flaggedDuplicates = \App\Models\Business::where('duplicate_flagged', true)->count();
     $openResets = \App\Models\PasswordResetRequest::open()->count();
-    $openWithdrawals = \App\Models\Withdrawal::open()->count();
 @endphp
 
 <div class="sidebar-section">
@@ -37,24 +36,6 @@
     <a href="{{ route('admin.reservations.index') }}"
        class="sidebar-link {{ request()->routeIs('admin.reservations.*') ? 'is-active' : '' }}">
         <x-ui.icon name="calendar" :size="16" /> Reservations
-    </a>
-</div>
-
-<div class="sidebar-section">
-    <div class="sidebar-heading">Money</div>
-
-    {{-- The withdrawal count sits in the navigation because each one is a bank
-         transfer somebody has to make by hand -- an unattended queue is an
-         owner waiting for their money. --}}
-    <a href="{{ route('admin.withdrawals.index') }}"
-       class="sidebar-link {{ request()->routeIs('admin.withdrawals.*') ? 'is-active' : '' }}">
-        <x-ui.icon name="wallet" :size="16" /> Withdrawals
-        @if ($openWithdrawals > 0)<span class="counter">{{ $openWithdrawals }}</span>@endif
-    </a>
-
-    <a href="{{ route('admin.treasury.index') }}"
-       class="sidebar-link {{ request()->routeIs('admin.treasury.*') ? 'is-active' : '' }}">
-        <x-ui.icon name="chart" :size="16" /> Treasury
     </a>
 </div>
 
