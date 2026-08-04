@@ -178,6 +178,10 @@ class ReservationController extends Controller
     {
         $this->authorize('manage', $business);
         abort_unless($spot->business_id === $business->id, 404);
+
+        // Already the exact model the route resolved -- attach it rather than
+        // let isBookable()/effectiveHours() lazy-load it a second time.
+        $spot->setRelation('business', $business);
         abort_unless($spot->isBookable(), 404);
 
         $date = Carbon::today();
@@ -203,6 +207,8 @@ class ReservationController extends Controller
     {
         $this->authorize('manage', $business);
         abort_unless($spot->business_id === $business->id, 404);
+
+        $spot->setRelation('business', $business);
         abort_unless($spot->isBookable(), 404);
 
         $validated = $request->validate([
@@ -233,6 +239,7 @@ class ReservationController extends Controller
     {
         $this->authorize('manage', $business);
         abort_unless($spot->business_id === $business->id, 404);
+        $spot->setRelation('business', $business);
 
         $validated = $request->validate([
             'start_datetime' => ['required', 'date'],

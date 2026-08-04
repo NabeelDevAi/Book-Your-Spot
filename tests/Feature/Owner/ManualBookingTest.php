@@ -61,6 +61,15 @@ class ManualBookingTest extends TestCase
     }
 
     #[Test]
+    public function an_owner_can_open_the_manual_booking_form(): void
+    {
+        $this->actingAs($this->owner)
+            ->get(route('owner.businesses.spots.reservations.create', [$this->business, $this->spot]))
+            ->assertOk()
+            ->assertSee($this->spot->name);
+    }
+
+    #[Test]
     public function an_owner_can_record_a_walk_in_booking_confirmed_immediately(): void
     {
         $this->actingAs($this->owner)
