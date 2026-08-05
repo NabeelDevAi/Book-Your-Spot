@@ -78,7 +78,7 @@ class BookingValidationTest extends TestCase
         $this->assertTrue($reservation->isPending());
         $this->assertSame(60, $reservation->duration_minutes);
         $this->assertEqualsWithDelta(600.0, (float) $reservation->total_price, 0.001);
-        $this->assertMatchesRegularExpression('/^BYS-/', $reservation->reference);
+        $this->assertMatchesRegularExpression('/^V365-/', $reservation->reference);
     }
 
     #[Test]

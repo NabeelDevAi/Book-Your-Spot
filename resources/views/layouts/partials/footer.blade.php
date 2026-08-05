@@ -1,6 +1,6 @@
 <footer class="app-footer">
     <div class="container-box app-footer-inner">
-        <span>&copy; {{ now()->year }} BookYourSpot — Karachi</span>
+        <span>&copy; {{ now()->year }} Venu365 — Karachi</span>
 
         <div class="footer-links">
             <span class="text-muted">Pay at the venue · No online payment</span>

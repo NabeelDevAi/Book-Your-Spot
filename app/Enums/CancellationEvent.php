@@ -33,7 +33,7 @@ enum CancellationEvent: string
         return match ($this) {
             self::CustomerCancelled => 'Cancelled by customer',
             self::OwnerCancelled => 'Cancelled by venue',
-            self::AdminCancelled => 'Cancelled by BookYourSpot',
+            self::AdminCancelled => 'Cancelled by Venu365',
             self::NoShow => 'Customer did not arrive',
         };
     }

@@ -10,11 +10,11 @@
 @endphp
 
 <{{ $tag }} @if ($href) href="{{ $href }}" @endif {{ $attributes->merge(['class' => 'brand']) }}>
-    <span class="{{ $markClass }}">B</span>
+    <span class="{{ $markClass }}">V</span>
 
     @if ($label)
         <span>
-            BookYourSpot
+            Venu365
             @if ($context)
                 <span class="text-muted" style="font-weight: var(--weight-normal);">{{ ucfirst($context) }}</span>
             @endif

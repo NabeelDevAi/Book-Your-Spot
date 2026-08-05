@@ -20,7 +20,7 @@ class ReservationModelTest extends TestCase
     {
         $reservation = Reservation::factory()->create();
 
-        $this->assertMatchesRegularExpression('/^BYS-[A-Z2-9]{6}$/', $reservation->reference);
+        $this->assertMatchesRegularExpression('/^V365-[A-Z2-9]{6}$/', $reservation->reference);
     }
 
     #[Test]

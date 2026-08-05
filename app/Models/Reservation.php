@@ -55,7 +55,7 @@ class Reservation extends Model
     }
 
     /**
-     * Short code the customer quotes at the venue, e.g. "BYS-8F3K2P".
+     * Short code the customer quotes at the venue, e.g. "V365-8F3K2P".
      *
      * Ambiguous characters (0/O, 1/I) are excluded because this gets read aloud
      * across a counter and typed in by an owner in a hurry.
@@ -63,7 +63,7 @@ class Reservation extends Model
     public static function generateReference(): string
     {
         $alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-        $prefix = config('booking.reference_prefix', 'BYS');
+        $prefix = config('booking.reference_prefix', 'V365');
 
         do {
             $code = '';

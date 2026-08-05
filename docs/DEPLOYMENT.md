@@ -1,4 +1,4 @@
-# BookYourSpot — Deployment & Operations
+# Venu365 — Deployment & Operations
 
 Everything needed to run V1 on a single Linux server. Written for the pilot
 setup described in the SRS: one city, desktop-only web, no payment provider.
@@ -68,7 +68,7 @@ php artisan view:cache
 ```
 
 > **Change the seeded admin password immediately.** `AdminSeeder` creates
-> `admin@bookyourspot.pk` with the password `password`. Admin accounts cannot be
+> `admin@venu365.pk` with the password `password`. Admin accounts cannot be
 > self-registered (FR-1.3), so this account is the only way in.
 
 `DemoDataSeeder` is skipped automatically outside `local`/`testing` — it is

@@ -1,4 +1,4 @@
-# BookYourSpot — Software Requirements Specification & Functional Requirements Document
+# Venu365 — Software Requirements Specification & Functional Requirements Document
 
 **Version:** 1.0
 **Document Type:** SRS + FRD (Combined)
@@ -11,7 +11,7 @@
 ## 1. Introduction
 
 ### 1.1 Purpose
-BookYourSpot is a web platform that lets sports and gaming venue owners ("Businesses") list their games/activities and individual bookable units ("Spots") for reservation, and lets Users discover, filter, and request bookings for those spots. This document defines the complete functional and non-functional requirements for the first full version (V1) of the platform.
+Venu365 is a web platform that lets sports and gaming venue owners ("Businesses") list their games/activities and individual bookable units ("Spots") for reservation, and lets Users discover, filter, and request bookings for those spots. This document defines the complete functional and non-functional requirements for the first full version (V1) of the platform.
 
 ### 1.2 Scope
 V1 covers three user roles — **Business Owner**, **User (Customer)**, and **Admin** — operating on a single web application (desktop-only, not mobile-responsive) built on Laravel + MySQL. V1 supports all sport and game verticals (cricket, futsal, padel, snooker, PS5/gaming zones, table tennis, etc.) — the platform is category-agnostic by design.
@@ -56,7 +56,7 @@ This hierarchy is the backbone of the entire data model and every functional mod
 ## 2. Overall Description
 
 ### 2.1 Product Perspective
-BookYourSpot is a new, standalone three-sided platform (Owner / User / Admin). It is not an extension of an existing system. V1 is a full functional release intended for real-world pilot use in a single geographic cluster within Karachi, not a throwaway prototype — but online payments, mobile apps, and monetization features are deliberately deferred to keep V1 shippable and focused.
+Venu365 is a new, standalone three-sided platform (Owner / User / Admin). It is not an extension of an existing system. V1 is a full functional release intended for real-world pilot use in a single geographic cluster within Karachi, not a throwaway prototype — but online payments, mobile apps, and monetization features are deliberately deferred to keep V1 shippable and focused.
 
 ### 2.2 User Classes and Characteristics
 

@@ -55,8 +55,8 @@ class RegisteredUserController extends Controller
         return redirect()->route($role->homeRoute())->with(
             'success',
             $role === UserRole::Owner
-                ? 'Welcome to BookYourSpot. Add your venue to get listed.'
-                : 'Welcome to BookYourSpot. Find a spot and send your first request.'
+                ? 'Welcome to Venu365. Add your venue to get listed.'
+                : 'Welcome to Venu365. Find a spot and send your first request.'
         );
     }
 }

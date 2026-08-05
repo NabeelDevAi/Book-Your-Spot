@@ -1,4 +1,4 @@
-# BookYourSpot — Wallet, Payments & Cancellation Plan
+# Venu365 — Wallet, Payments & Cancellation Plan
 
 **Version:** 1.0 (implementation plan, pre-code)
 **Supersedes:** SRS §12 deferral of "Online payment integration"

@@ -1,6 +1,6 @@
 /*
  |----------------------------------------------------------------------
- | BookYourSpot -- application entry point
+ | Venu365 -- application entry point
  |----------------------------------------------------------------------
  | Plain ES modules, no framework. Every behaviour is opt-in via a data-
  | attribute so server-rendered Blade stays the source of truth.

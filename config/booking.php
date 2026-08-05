@@ -110,7 +110,7 @@ return [
     | since payment is collected in person.
     */
 
-    'reference_prefix' => 'BYS',
+    'reference_prefix' => 'V365',
 
     /*
     |--------------------------------------------------------------------------

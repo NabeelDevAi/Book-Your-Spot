@@ -1,8 +1,8 @@
-# BookYourSpot — Full UI/UX Redesign Prompt (for Claude Code)
+# Venu365 — Full UI/UX Redesign Prompt (for Claude Code)
 
 ## 0. Context — Read Before Starting
 
-BookYourSpot is a **sports & gaming venue booking marketplace** for Karachi, Pakistan (think Playo/Hudle but local — turf, cricket grounds, snooker, PS5/gaming zones, badminton courts, etc.). The **backend system is fully built and functional** — Laravel + MySQL, three roles (Business Owner, Customer, Admin), full booking lifecycle (pending → confirmed → completed/cancelled/no-show/rejected), Business → Game → Spot hierarchy. **V1 is desktop-only (not responsive)** — do not spend effort on mobile breakpoints unless told otherwise.
+Venu365 is a **sports & gaming venue booking marketplace** for Karachi, Pakistan (think Playo/Hudle but local — turf, cricket grounds, snooker, PS5/gaming zones, badminton courts, etc.). The **backend system is fully built and functional** — Laravel + MySQL, three roles (Business Owner, Customer, Admin), full booking lifecycle (pending → confirmed → completed/cancelled/no-show/rejected), Business → Game → Spot hierarchy. **V1 is desktop-only (not responsive)** — do not spend effort on mobile breakpoints unless told otherwise.
 
 **Tech stack constraint: Laravel + plain Blade templates + CSS + vanilla JS.** No React/Vue/Alpine/Tailwind build pipeline unless explicitly approved — if you want to introduce Alpine.js or a lightweight animation library (GSAP, anime.js) for interactivity, propose it first, don't silently add a framework.
 

@@ -17,7 +17,7 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'admin@bookyourspot.pk'],
+            ['email' => 'admin@venu365.pk'],
             [
                 'name' => 'Platform Admin',
                 'phone' => '+923001112233',
