@@ -8,6 +8,7 @@ use App\Http\Controllers\Owner\ImageController;
 use App\Http\Controllers\Owner\ReservationController;
 use App\Http\Controllers\Owner\SpotBlockController;
 use App\Http\Controllers\Owner\SpotController;
+use App\Http\Controllers\ReservationInvoiceController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +29,8 @@ Route::middleware(['auth', 'role:owner'])
         // FR-2.7 / FR-4.6 -- the daily queue and responding to requests.
         Route::get('reservations', [ReservationController::class, 'index'])->name('reservations.index');
         Route::get('reservations/{reservation}', [ReservationController::class, 'show'])->name('reservations.show');
+        Route::get('reservations/{reservation}/invoice', [ReservationInvoiceController::class, 'download'])
+            ->name('reservations.invoice');
         Route::post('reservations/{reservation}/approve', [ReservationController::class, 'approve'])->name('reservations.approve');
         Route::post('reservations/{reservation}/reject', [ReservationController::class, 'reject'])->name('reservations.reject');
         Route::post('reservations/{reservation}/cancel', [ReservationController::class, 'cancel'])->name('reservations.cancel');

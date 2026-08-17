@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ReservationInvoiceController;
 use App\Http\Controllers\Site\BookingController;
 use App\Http\Controllers\Site\BookingHistoryController;
 use App\Http\Controllers\Site\BusinessController;
@@ -24,6 +25,12 @@ Route::get('/venues/{business}', [BusinessController::class, 'show'])->name('bus
 Route::get('/spots/{spot}/book', [BookingController::class, 'create'])->name('bookings.create');
 Route::get('/spots/{spot}/slots', [BookingController::class, 'slots'])->name('bookings.slots');
 
+// The WhatsApp-shared PDF: a signed link needs no login, since the person
+// opening it (a friend, the venue) usually isn't signed into this account.
+Route::get('/bookings/{reservation}/invoice/shared', [ReservationInvoiceController::class, 'shared'])
+    ->middleware('signed')
+    ->name('bookings.invoice.shared');
+
 /*
 |--------------------------------------------------------------------------
 | Customer routes
@@ -42,6 +49,8 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 
     Route::get('/bookings', [BookingHistoryController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{reservation}', [BookingController::class, 'show'])->name('bookings.show');
+    Route::get('/bookings/{reservation}/invoice', [ReservationInvoiceController::class, 'download'])
+        ->name('bookings.invoice');
     Route::post('/bookings/{reservation}/cancel', [BookingHistoryController::class, 'cancel'])
         ->name('bookings.cancel');
 });

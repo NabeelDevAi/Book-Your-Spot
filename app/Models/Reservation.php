@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 
 #[Fillable([
@@ -233,6 +234,51 @@ class Reservation extends Model
     public function getRouteKeyName(): string
     {
         return 'reference';
+    }
+
+    /** File name for the downloadable PDF, e.g. "Venu365-V365-8F3K2P.pdf". */
+    public function invoiceFilename(): string
+    {
+        return Str::slug(config('app.name')).'-'.$this->reference.'.pdf';
+    }
+
+    /**
+     * A signed link to the PDF that needs no login to open -- the point of
+     * sharing it is that the person on the other end of WhatsApp usually
+     * isn't signed into this account. Regenerated on every page load, so the
+     * expiry only has to outlive a chat, not the booking itself.
+     */
+    public function sharedInvoiceUrl(): string
+    {
+        return URL::temporarySignedRoute(
+            'bookings.invoice.shared',
+            now()->addDays(7),
+            ['reservation' => $this],
+        );
+    }
+
+    /**
+     * "Share via WhatsApp" without the Business API: a wa.me deep link with
+     * the message pre-filled, same as the share buttons on any site that
+     * doesn't run its own WhatsApp integration. Works for a customer sharing
+     * their ticket or an owner forwarding a confirmation, signed in or not.
+     */
+    public function whatsappShareUrl(): string
+    {
+        // loadMissing rather than trust the caller: this runs from the PDF
+        // view, the booking confirmation page and the owner console alike,
+        // and not all of them eager-load the same relations.
+        $this->loadMissing('business', 'spot');
+
+        $lines = [
+            $this->business->name.' — booking '.$this->reference,
+            $this->spot->name.' · '.$this->dateLabel(),
+            $this->timeRangeLabel().' ('.$this->durationLabel().')',
+            'Total: '.$this->totalPriceLabel().' · payable at the venue',
+            $this->sharedInvoiceUrl(),
+        ];
+
+        return 'https://wa.me/?text='.rawurlencode(implode("\n", $lines));
     }
 
     /*

@@ -130,6 +130,19 @@
     box-shadow: var(--glow-accent);
 }
 
+/* WhatsApp's own green, not a token -- this button borrows recognition from
+   an outside brand on purpose, so it stays the same colour in both themes
+   rather than following ours. */
+.btn-whatsapp {
+    background-color: #25d366;
+    border-color: #25d366;
+    color: #05260f;
+}
+.btn-whatsapp:hover {
+    background-color: #22c15e;
+    border-color: #22c15e;
+}
+
 /* ---- Sizes ------------------------------------------------------------ */
 
 .btn-sm {

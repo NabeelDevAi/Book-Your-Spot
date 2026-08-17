@@ -11,6 +11,13 @@
                 <x-ui.badge variant="neutral">{{ $reservation->channel->label() }}</x-ui.badge>
             @endif
             <x-ui.badge :status="$reservation->status->value">{{ $reservation->status->label() }}</x-ui.badge>
+
+            <x-ui.button :href="route('owner.reservations.invoice', $reservation)" target="_blank" variant="secondary" size="sm" icon="download">
+                PDF
+            </x-ui.button>
+            <x-ui.button :href="$reservation->whatsappShareUrl()" target="_blank" rel="noopener" variant="whatsapp" size="sm">
+                <x-ui.whatsapp-icon size="14" /> Share
+            </x-ui.button>
         </x-slot:actions>
     </x-ui.page-header>
 

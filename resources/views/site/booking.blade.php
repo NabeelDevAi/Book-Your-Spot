@@ -35,7 +35,16 @@
 
         {{-- The booking as a ticket stub. Leads the page: it is what the
              customer came back to this screen to look at. --}}
-        <x-ui.stub :reservation="$reservation" data-reveal style="margin-bottom: var(--space-6);" />
+        <x-ui.stub :reservation="$reservation" data-reveal style="margin-bottom: var(--space-4);" />
+
+        <div class="btn-group" style="margin-bottom: var(--space-6);">
+            <x-ui.button :href="route('bookings.invoice', $reservation)" target="_blank" variant="secondary" icon="download">
+                Download PDF
+            </x-ui.button>
+            <x-ui.button :href="$reservation->whatsappShareUrl()" target="_blank" rel="noopener" variant="whatsapp">
+                <x-ui.whatsapp-icon size="16" /> Share via WhatsApp
+            </x-ui.button>
+        </div>
 
         <x-ui.card>
             <div class="stack-6">
