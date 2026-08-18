@@ -219,7 +219,7 @@ class ReservationModelTest extends TestCase
         $spot = Spot::factory()->futsal()->create();
 
         $reservation = Reservation::factory()->forSpot($spot)->confirmed()->create([
-            'total_price' => $spot->priceFor(60),
+            'total_price' => $spot->priceFor(Carbon::parse('2026-08-03'), 60),
         ]);
 
         $spot->update(['price_amount' => 5000]);

@@ -45,16 +45,37 @@ class RegistrationTest extends TestCase
     }
 
     #[Test]
-    public function an_owner_can_register_and_lands_on_the_owner_console(): void
+    public function an_owner_registers_pending_and_is_not_logged_in(): void
     {
-        // FR-1.2: the owner track is a separate flow behind the same form, and
-        // drops them straight into their console to add a venue.
+        // Owner-account approval gate (SRS amendment): the owner track creates
+        // the account but does NOT log them in -- it can't do anything until
+        // an Admin approves it.
         $response = $this->post('/register', $this->validPayload(['role' => 'owner']));
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('owner.dashboard'));
+        $this->assertGuest();
+        $response->assertRedirect(route('login'));
 
-        $this->assertSame(UserRole::Owner, User::where('email', 'ali@example.com')->sole()->role);
+        $user = User::where('email', 'ali@example.com')->sole();
+        $this->assertSame(UserRole::Owner, $user->role);
+        $this->assertSame(UserStatus::PendingApproval, $user->status);
+    }
+
+    #[Test]
+    public function a_pending_owner_cannot_log_in(): void
+    {
+        $this->post('/register', $this->validPayload(['role' => 'owner']));
+
+        $response = $this->post('/login', [
+            'email' => 'ali@example.com',
+            'password' => 'password123',
+        ]);
+
+        $this->assertGuest();
+        $response->assertSessionHasErrors('email');
+        $this->assertStringContainsString(
+            'awaiting admin approval',
+            session('errors')->first('email'),
+        );
     }
 
     #[Test]

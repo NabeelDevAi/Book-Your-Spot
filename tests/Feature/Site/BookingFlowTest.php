@@ -43,7 +43,6 @@ class BookingFlowTest extends TestCase
             'price_amount' => 100,
             'price_unit_minutes' => 10,
             'min_duration_minutes' => 30,
-            'max_duration_minutes' => 240,
         ]);
     }
 

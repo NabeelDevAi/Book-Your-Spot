@@ -55,7 +55,6 @@ class BookingValidationTest extends TestCase
             'price_amount' => 100,
             'price_unit_minutes' => 10,
             'min_duration_minutes' => 30,
-            'max_duration_minutes' => 240,
         ], $spotAttributes));
     }
 
@@ -157,13 +156,20 @@ class BookingValidationTest extends TestCase
         $this->service->request($this->spot, $this->customer, $this->tomorrowAt(19), 20);
     }
 
+    /**
+     * SRS amendment: there is no owner-set maximum any more -- a booking can
+     * run as long as a single day's opening hours allow. A duration too long
+     * to fit is rejected for being outside operating hours, not against a
+     * configured ceiling. The spot here is open 10:00-23:00 (13 hours); 900
+     * minutes (15 hours) from noon runs well past close.
+     */
     #[Test]
-    public function a_duration_above_the_maximum_is_rejected(): void
+    public function a_duration_too_long_for_the_day_is_rejected_as_outside_operating_hours(): void
     {
         $this->expectException(BookingException::class);
-        $this->expectExceptionMessage('longest booking');
+        $this->expectExceptionMessage('outside opening hours');
 
-        $this->service->request($this->spot, $this->customer, $this->tomorrowAt(12), 300);
+        $this->service->request($this->spot, $this->customer, $this->tomorrowAt(12), 900);
     }
 
     /*

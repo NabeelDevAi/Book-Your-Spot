@@ -7,6 +7,8 @@ use App\Models\Business;
 use App\Models\Reservation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
@@ -323,5 +325,22 @@ class BusinessManagementTest extends TestCase
         $this->actingAs($owner)->delete(route('owner.businesses.destroy', $business))->assertRedirect();
 
         $this->assertSoftDeleted($business);
+    }
+
+    #[Test]
+    public function a_venue_can_be_created_with_photos_and_videos_together(): void
+    {
+        Storage::fake('public');
+
+        $owner = User::factory()->owner()->create();
+
+        $this->actingAs($owner)->post(route('owner.businesses.store'), $this->payload([
+            'images' => [UploadedFile::fake()->image('venue.jpg')],
+            'videos' => [UploadedFile::fake()->create('tour.mp4', 500, 'video/mp4')],
+        ]))->assertRedirect();
+
+        $business = Business::sole();
+        $this->assertSame(1, $business->images()->where('media_type', 'image')->count());
+        $this->assertSame(1, $business->images()->where('media_type', 'video')->count());
     }
 }

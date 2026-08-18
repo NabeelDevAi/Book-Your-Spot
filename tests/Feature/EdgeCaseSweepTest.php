@@ -71,7 +71,6 @@ class EdgeCaseSweepTest extends TestCase
             'price_amount' => 100,
             'price_unit_minutes' => 10,
             'min_duration_minutes' => 30,
-            'max_duration_minutes' => 240,
         ]);
     }
 
@@ -246,7 +245,13 @@ class EdgeCaseSweepTest extends TestCase
         }
 
         $this->assertBookingRefused(fn () => $this->request(duration: 20), 'shortest booking');
-        $this->assertBookingRefused(fn () => $this->request(start: $this->at(12), duration: 300), 'longest booking');
+
+        // SRS amendment: there is no owner-set maximum any more -- a duration
+        // too long to fit in the day is refused for being outside operating
+        // hours, not against some configured ceiling. The venue here is open
+        // 10:00-23:00 (13 hours); 900 minutes (15 hours) from noon runs well
+        // past close.
+        $this->assertBookingRefused(fn () => $this->request(start: $this->at(12), duration: 900), 'outside opening hours');
     }
 
     /*
