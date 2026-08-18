@@ -2,6 +2,8 @@
     $pendingBusinesses = \App\Models\Business::where('status', \App\Enums\BusinessStatus::PendingReview)->count();
     $flaggedDuplicates = \App\Models\Business::where('duplicate_flagged', true)->count();
     $openResets = \App\Models\PasswordResetRequest::open()->count();
+    $pendingOwners = \App\Models\User::where('role', \App\Enums\UserRole::Owner)
+        ->where('status', \App\Enums\UserStatus::PendingApproval)->count();
 @endphp
 
 <div class="sidebar-section">
@@ -47,9 +49,15 @@
         <x-ui.icon name="layers" :size="16" /> Categories
     </a>
 
+    <a href="{{ route('admin.holidays.index') }}"
+       class="sidebar-link {{ request()->routeIs('admin.holidays.*') ? 'is-active' : '' }}">
+        <x-ui.icon name="calendar" :size="16" /> Holidays
+    </a>
+
     <a href="{{ route('admin.users.index') }}"
        class="sidebar-link {{ request()->routeIs('admin.users.*') ? 'is-active' : '' }}">
         <x-ui.icon name="users" :size="16" /> Users &amp; owners
+        @if ($pendingOwners > 0)<span class="counter">{{ $pendingOwners }}</span>@endif
     </a>
 
     <a href="{{ route('admin.password-requests.index') }}"

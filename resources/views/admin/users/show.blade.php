@@ -11,6 +11,18 @@
                 {{-- Admin accounts cannot be self-registered, so suspending one
                      could lock the platform out of its own moderation tools. --}}
                 <span class="text-muted text-sm">Administrator accounts can't be moderated here.</span>
+            @elseif ($user->isOwner() && in_array($user->status, [\App\Enums\UserStatus::PendingApproval, \App\Enums\UserStatus::Rejected], true))
+                <div class="btn-group">
+                    <form method="POST" action="{{ route('admin.users.approve-owner', $user) }}">
+                        @csrf
+                        <x-ui.button type="submit" variant="success" icon="check">Approve account</x-ui.button>
+                    </form>
+                    @if ($user->status === \App\Enums\UserStatus::PendingApproval)
+                        <x-ui.button variant="danger-outline" type="button" data-modal-open="reject-owner">
+                            Reject
+                        </x-ui.button>
+                    @endif
+                </div>
             @elseif ($user->isSuspended())
                 <form method="POST" action="{{ route('admin.users.reinstate', $user) }}"
                       data-confirm="Reinstate this account?"
@@ -34,6 +46,14 @@
             @if ($user->suspended_at)
                 <span class="text-sm"> — {{ $user->suspended_at->format('j M Y, g:i A') }}</span>
             @endif
+        </x-ui.alert>
+    @elseif ($user->status === \App\Enums\UserStatus::PendingApproval)
+        <x-ui.alert variant="warning" title="Awaiting approval" style="margin-bottom: var(--space-5);">
+            This Owner account can't log in until it's approved or rejected.
+        </x-ui.alert>
+    @elseif ($user->status === \App\Enums\UserStatus::Rejected)
+        <x-ui.alert variant="danger" title="Registration rejected" style="margin-bottom: var(--space-5);">
+            {{ $user->rejection_reason }}
         </x-ui.alert>
     @endif
 
@@ -71,6 +91,23 @@
             </dl>
         </x-ui.card>
     </div>
+
+    @if ($user->isOwner() && $user->status === \App\Enums\UserStatus::PendingApproval)
+        <x-ui.modal id="reject-owner" title="Reject this account" subtitle="They're told why, and can't log in unless later approved.">
+            <form method="POST" action="{{ route('admin.users.reject-owner', $user) }}" class="form" id="reject-owner-form">
+                @csrf
+                <x-ui.field label="Reason" name="reason" required hint="Shown to them if the account is ever reviewed again.">
+                    <x-ui.textarea name="reason" rows="3" required
+                                   placeholder="Could not verify the business details provided." />
+                </x-ui.field>
+            </form>
+
+            <x-slot:footer>
+                <x-ui.button variant="secondary" type="button" data-modal-close>Back</x-ui.button>
+                <x-ui.button variant="danger" type="submit" form="reject-owner-form">Reject account</x-ui.button>
+            </x-slot:footer>
+        </x-ui.modal>
+    @endif
 
     @unless ($user->isAdmin() || $user->isSuspended())
         <x-ui.modal id="suspend-user" title="Suspend this account" subtitle="{{ $user->name }} will be logged out and unable to sign back in.">

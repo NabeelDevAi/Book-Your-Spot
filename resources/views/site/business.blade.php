@@ -14,10 +14,15 @@
         Real photos still win when a venue has uploaded any; the gallery below
         the fold keeps the rest.
     --}}
+    @php
+        $businessPhotos = $business->images->where('media_type', 'image')->values();
+        $businessVideos = $business->images->where('media_type', 'video')->values();
+    @endphp
+
     <header class="venue-hero">
         <div class="venue-hero-media crest-frame">
-            @if ($business->images->isNotEmpty())
-                <img src="{{ $business->images->first()->url() }}" alt="{{ $business->name }}">
+            @if ($businessPhotos->isNotEmpty())
+                <img src="{{ $businessPhotos->first()->url() }}" alt="{{ $business->name }}">
             @else
                 <x-ui.crest :business="$business" morph />
             @endif
@@ -39,11 +44,16 @@
         </div>
     </header>
 
-    @if ($business->images->count() > 1)
+    @if ($businessPhotos->count() > 1 || $businessVideos->isNotEmpty())
         <div class="venue-gallery">
-            @foreach ($business->images->skip(1) as $image)
+            @foreach ($businessPhotos->skip(1) as $image)
                 @break($loop->index >= 4)
                 <img src="{{ $image->url() }}" alt="{{ $business->name }}" loading="lazy">
+            @endforeach
+
+            @foreach ($businessVideos as $video)
+                @break($loop->index >= 2)
+                <video src="{{ $video->url() }}" controls preload="metadata"></video>
             @endforeach
         </div>
     @endif
@@ -86,8 +96,7 @@
                                 <div class="spot-row-name">{{ $spot->name }}</div>
 
                                 <div class="spot-row-meta">
-                                    {{ \App\Support\Money::duration($spot->min_duration_minutes) }}
-                                    – {{ \App\Support\Money::duration($spot->max_duration_minutes) }}
+                                    {{ \App\Support\Money::duration($spot->min_duration_minutes) }} minimum
                                     · booked in {{ \App\Support\Money::duration($spot->price_unit_minutes) }} blocks
                                     @if ($spot->hasHoursOverride())
                                         · <span class="text-warning">different hours: {{ $spot->effectiveHours()->summary() }}</span>

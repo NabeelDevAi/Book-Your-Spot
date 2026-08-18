@@ -59,7 +59,7 @@
     >
         <div class="form">
             <div class="form-row">
-                <x-ui.field label="Rate" name="price_amount" required>
+                <x-ui.field label="Weekday rate" name="price_amount" required hint="Mon–Fri.">
                     <x-ui.input
                         name="price_amount"
                         type="number"
@@ -73,58 +73,62 @@
                 </x-ui.field>
 
                 <x-ui.field
-                    label="Per"
+                    label="Weekend rate"
+                    name="weekend_price_amount"
+                    hint="Sat, Sun and public holidays (and the day before one). Leave blank to charge the weekday rate."
+                >
+                    <x-ui.input
+                        name="weekend_price_amount"
+                        type="number"
+                        step="1"
+                        min="1"
+                        :value="$isEdit ? ($spot->weekend_price_amount !== null ? (int) $spot->weekend_price_amount : null) : null"
+                        prefix="Rs."
+                        placeholder="Same as weekday"
+                    />
+                </x-ui.field>
+            </div>
+
+            <x-ui.field
+                label="Per"
+                name="price_unit_minutes"
+                required
+                hint="Bookings are billed and validated in whole units of this."
+            >
+                <x-ui.select
                     name="price_unit_minutes"
                     required
-                    hint="Bookings are billed and validated in whole units of this."
+                    :selected="$isEdit ? $spot->price_unit_minutes : 60"
                 >
-                    <x-ui.select
-                        name="price_unit_minutes"
-                        required
-                        :selected="$isEdit ? $spot->price_unit_minutes : 60"
-                    >
-                        @foreach ($units as $unit)
-                            <option value="{{ $unit }}"
-                                @selected((int) old('price_unit_minutes', $isEdit ? $spot->price_unit_minutes : 60) === $unit)>
-                                {{ \App\Support\Money::duration($unit) }}
-                            </option>
-                        @endforeach
-                    </x-ui.select>
-                </x-ui.field>
-            </div>
+                    @foreach ($units as $unit)
+                        <option value="{{ $unit }}"
+                            @selected((int) old('price_unit_minutes', $isEdit ? $spot->price_unit_minutes : 60) === $unit)>
+                            {{ \App\Support\Money::duration($unit) }}
+                        </option>
+                    @endforeach
+                </x-ui.select>
+            </x-ui.field>
 
-            {{-- SRS 9.7: both bounds must be whole billing units, or the spot
-                 advertises durations it can't price. Enforced in SpotRequest. --}}
-            <div class="form-row">
-                <x-ui.field
-                    label="Minimum booking"
+            {{-- SRS 9.7: must be a whole billing unit, or the spot advertises
+                 a minimum it can't price. Enforced in SpotRequest. There is no
+                 maximum any more -- a booking can run as long as a single day's
+                 opening hours allow. --}}
+            <x-ui.field
+                label="Minimum booking"
+                name="min_duration_minutes"
+                required
+                hint="Must be a multiple of the billing unit. No maximum — a booking can run until the spot closes for the day."
+            >
+                <x-ui.input
                     name="min_duration_minutes"
+                    type="number"
+                    step="1"
+                    min="1"
+                    :value="$isEdit ? $spot->min_duration_minutes : 60"
                     required
-                    hint="Must be a multiple of the billing unit."
-                >
-                    <x-ui.input
-                        name="min_duration_minutes"
-                        type="number"
-                        step="1"
-                        min="1"
-                        :value="$isEdit ? $spot->min_duration_minutes : 60"
-                        required
-                        affix="min"
-                    />
-                </x-ui.field>
-
-                <x-ui.field label="Maximum booking" name="max_duration_minutes" required>
-                    <x-ui.input
-                        name="max_duration_minutes"
-                        type="number"
-                        step="1"
-                        min="1"
-                        :value="$isEdit ? $spot->max_duration_minutes : 180"
-                        required
-                        affix="min"
-                    />
-                </x-ui.field>
-            </div>
+                    affix="min"
+                />
+            </x-ui.field>
         </div>
     </x-ui.card>
 
@@ -148,10 +152,23 @@
         subtitle="Up to {{ config('booking.max_spot_images') }} photos of this specific spot."
     >
         <x-image-uploader
-            :images="$isEdit ? $spot->images : null"
+            :images="$isEdit ? $spot->images->where('media_type', 'image') : null"
             :max="config('booking.max_spot_images')"
             :delete-route="$isEdit
                 ? fn ($image) => route('owner.businesses.spots.images.destroy', [$business, $spot, $image])
+                : null"
+        />
+    </x-ui.card>
+
+    <x-ui.card
+        title="Videos"
+        subtitle="Up to {{ config('booking.max_spot_videos') }} short clips of this spot."
+    >
+        <x-video-uploader
+            :videos="$isEdit ? $spot->images->where('media_type', 'video') : null"
+            :max="config('booking.max_spot_videos')"
+            :delete-route="$isEdit
+                ? fn ($video) => route('owner.businesses.spots.images.destroy', [$business, $spot, $video])
                 : null"
         />
     </x-ui.card>

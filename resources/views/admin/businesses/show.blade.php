@@ -85,7 +85,7 @@
                     <div class="table-wrap">
                         <table class="table table-compact">
                             <thead>
-                                <tr><th>Spot</th><th>Category</th><th>Rate</th><th>Length</th><th>Status</th></tr>
+                                <tr><th>Spot</th><th>Category</th><th>Rate</th><th>Minimum</th><th>Status</th></tr>
                             </thead>
                             <tbody>
                                 @foreach ($business->spots as $spot)
@@ -94,8 +94,7 @@
                                         <td>{{ $business->businessGames->firstWhere('id', $spot->business_game_id)?->game->name }}</td>
                                         <td class="mono">{{ $spot->rateLabel() }}</td>
                                         <td class="cell-secondary">
-                                            {{ \App\Support\Money::duration($spot->min_duration_minutes) }}
-                                            – {{ \App\Support\Money::duration($spot->max_duration_minutes) }}
+                                            {{ \App\Support\Money::duration($spot->min_duration_minutes) }} min
                                         </td>
                                         <td>
                                             <x-ui.badge :variant="$spot->status->badge()">

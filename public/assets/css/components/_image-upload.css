@@ -84,11 +84,14 @@
 }
 
 .upload-preview img,
-.image-tile img {
+.image-tile img,
+.upload-preview video,
+.image-tile video {
     width: 100%;
     height: 110px;
     object-fit: cover;
     display: block;
+    background-color: var(--surface-sunken);
 }
 
 .upload-preview.is-invalid {

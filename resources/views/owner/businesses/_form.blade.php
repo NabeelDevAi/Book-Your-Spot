@@ -97,10 +97,23 @@
         subtitle="Up to {{ config('booking.max_business_images') }}. The first is used as the cover."
     >
         <x-image-uploader
-            :images="$isEdit ? $business->images : null"
+            :images="$isEdit ? $business->images->where('media_type', 'image') : null"
             :max="config('booking.max_business_images')"
             :delete-route="$isEdit
                 ? fn ($image) => route('owner.businesses.images.destroy', [$business, $image])
+                : null"
+        />
+    </x-ui.card>
+
+    <x-ui.card
+        title="Videos"
+        subtitle="Up to {{ config('booking.max_business_videos') }} short clips of the venue."
+    >
+        <x-video-uploader
+            :videos="$isEdit ? $business->images->where('media_type', 'video') : null"
+            :max="config('booking.max_business_videos')"
+            :delete-route="$isEdit
+                ? fn ($video) => route('owner.businesses.images.destroy', [$business, $video])
                 : null"
         />
     </x-ui.card>

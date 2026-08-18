@@ -4,6 +4,14 @@
         description="Every account on the platform (FR-3.4)."
     />
 
+    @if ($pendingOwnerCount > 0)
+        <x-ui.alert variant="warning" style="margin-bottom: var(--space-5);">
+            <strong>{{ $pendingOwnerCount }}</strong>
+            Owner {{ Str::plural('account', $pendingOwnerCount) }} awaiting approval.
+            They can't log in until you approve or reject them.
+        </x-ui.alert>
+    @endif
+
     <form method="GET" class="filter-bar">
         <x-ui.field label="Search" name="search" style="flex: 1 1 auto;">
             <x-ui.input name="search" :value="request('search')" placeholder="Name, email or phone" />
@@ -58,7 +66,7 @@
                     </thead>
                     <tbody>
                         @foreach ($users as $user)
-                            <tr class="{{ $user->isSuspended() ? 'is-danger' : '' }}">
+                            <tr class="{{ $user->isSuspended() ? 'is-danger' : ($user->status === \App\Enums\UserStatus::PendingApproval ? 'is-attention' : '') }}">
                                 <td>
                                     <div class="cluster-2">
                                         <x-ui.avatar :name="$user->name" size="sm" />
@@ -86,9 +94,23 @@
                                 </td>
                                 <td class="cell-secondary">{{ $user->created_at->format('j M Y') }}</td>
                                 <td class="cell-actions">
-                                    <x-ui.button :href="route('admin.users.show', $user)" variant="secondary" size="sm">
-                                        View
-                                    </x-ui.button>
+                                    @if ($user->isOwner() && $user->status === \App\Enums\UserStatus::PendingApproval)
+                                        <div class="btn-group">
+                                            <form method="POST" action="{{ route('admin.users.approve-owner', $user) }}">
+                                                @csrf
+                                                <x-ui.button type="submit" variant="success" size="sm" icon="check">
+                                                    Approve
+                                                </x-ui.button>
+                                            </form>
+                                            <x-ui.button :href="route('admin.users.show', $user)" variant="secondary" size="sm">
+                                                Review
+                                            </x-ui.button>
+                                        </div>
+                                    @else
+                                        <x-ui.button :href="route('admin.users.show', $user)" variant="secondary" size="sm">
+                                            View
+                                        </x-ui.button>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

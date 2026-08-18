@@ -57,7 +57,7 @@
                                     <tr>
                                         <th>Spot</th>
                                         <th>Rate</th>
-                                        <th>Booking length</th>
+                                        <th>Minimum booking</th>
                                         <th>Hours</th>
                                         <th>Status</th>
                                         <th class="cell-actions">Actions</th>
@@ -78,7 +78,6 @@
                                             <td class="mono">{{ $spot->rateLabel() }}</td>
                                             <td class="cell-secondary">
                                                 {{ \App\Support\Money::duration($spot->min_duration_minutes) }}
-                                                – {{ \App\Support\Money::duration($spot->max_duration_minutes) }}
                                             </td>
                                             <td class="cell-secondary">
                                                 @if ($spot->hasHoursOverride())

@@ -58,3 +58,179 @@
     .console-sidebar .brand > span:not(.brand-mark) { display: none; }
     .console-sidebar .sidebar-link { justify-content: center; }
 }
+
+/*
+ |----------------------------------------------------------------------
+ | Below 768: phones and small tablets
+ |----------------------------------------------------------------------
+ | This IS a mobile layout, unlike everything above -- the amendment that
+ | added it deliberately keeps the same visual language (same components,
+ | same tokens) rather than a parallel "mobile UI"; only the arrangement
+ | changes: multi-column grids drop to one column, the console sidebar
+ | becomes an off-canvas drawer instead of a persistent rail, and forms
+ | stack their paired fields.
+ */
+@media (max-width: 767px) {
+    /* Tighter side margins than the desktop gutter -- 2rem on each side of a
+       375px phone leaves an uncomfortably narrow content column. */
+    :root {
+        --gutter: var(--space-4);
+    }
+
+    /* ---- Console shell: sidebar becomes a drawer, not a mini-rail ------- */
+
+    .console-sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: var(--z-overlay);
+        width: min(300px, 84vw);
+        transform: translateX(-100%);
+        transition: transform var(--transition-base);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .console-sidebar .sidebar-link span,
+    .console-sidebar .business-switcher-name,
+    .console-sidebar .business-switcher-meta,
+    .console-sidebar .sidebar-heading,
+    .console-sidebar .brand > span:not(.brand-mark) {
+        display: revert;
+    }
+    .console-sidebar .sidebar-link { justify-content: flex-start; }
+
+    .console-sidebar-close { display: inline-flex; }
+
+    .console-sidebar-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: calc(var(--z-overlay) - 1);
+        background-color: rgb(0 0 0 / 45%);
+        border: 0;
+        padding: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--transition-base);
+    }
+
+    [data-console-shell].is-nav-open .console-sidebar {
+        transform: translateX(0);
+    }
+
+    [data-console-shell].is-nav-open .console-sidebar-backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .console-nav-toggle { display: inline-flex; }
+
+    .console-content { padding: var(--space-4); }
+    .console-topbar { padding-inline: var(--space-4); gap: var(--space-3); }
+
+    /* ---- Page chrome ------------------------------------------------- */
+
+    .app-main { padding-block: var(--space-5); }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-3);
+    }
+
+    .page-actions { flex-wrap: wrap; }
+    .page-actions .btn { flex: 1 1 auto; }
+
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .filter-bar-actions { margin-left: 0; }
+
+    /* ---- Grids: everything drops to one column ------------------------ */
+
+    .grid-2,
+    .grid-3,
+    .form-row,
+    .form-row-3,
+    .stat-row,
+    .stat-row-3,
+    .venue-grid,
+    .search-row,
+    .search-row-secondary,
+    .slot-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .venue-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: 110px 110px;
+    }
+
+    .venue-hero {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* ---- Tables: row actions wrap instead of forcing horizontal scroll -- */
+
+    .btn-group { flex-wrap: wrap; }
+    .cell-actions .btn-group { justify-content: flex-start; }
+
+    /* ---- Media uploaders: fewer tiles per row -------------------------- */
+
+    .upload-previews,
+    .image-gallery {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    /* ---- Hours editor: open/close inputs stack instead of a tight row -- */
+
+    .hours-range {
+        flex-wrap: wrap;
+    }
+
+    /* ---- Auth screens: drop the decorative brand panel ----------------- */
+
+    .auth-shell {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .auth-aside { display: none; }
+    .auth-main { padding: var(--space-6) var(--space-4); }
+
+    .role-choice {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* ---- Site topbar: let the nav wrap instead of crushing together ---- */
+
+    .topbar {
+        height: auto;
+        min-height: var(--topbar-height);
+    }
+    .topbar-inner {
+        flex-wrap: wrap;
+        gap: var(--space-3);
+        padding-block: var(--space-3);
+    }
+    .topbar-nav {
+        order: 3;
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    /* ---- Dropdown panels: don't run off the left edge of a narrow screen */
+
+    .notification-menu {
+        width: min(380px, calc(100vw - var(--space-4) * 2));
+    }
+}
+
+/* ---- Below 480: the smallest phones ----------------------------------- */
+@media (max-width: 479px) {
+    .venue-gallery { grid-template-columns: minmax(0, 1fr); }
+
+    .upload-previews,
+    .image-gallery {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .modal-footer { flex-direction: column-reverse; align-items: stretch; }
+}

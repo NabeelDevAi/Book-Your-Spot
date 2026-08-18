@@ -23,10 +23,17 @@
     @stack('head')
 </head>
 <body>
-    <div class="console-shell">
+    <div class="console-shell" data-console-shell>
+        <button type="button" class="console-sidebar-backdrop" data-console-nav-close
+                aria-label="Close navigation"></button>
+
         <aside class="console-sidebar">
             <div class="console-sidebar-header">
                 <x-brand :href="route($context === 'admin' ? 'admin.dashboard' : 'owner.dashboard')" :context="$context" />
+
+                <button type="button" class="console-sidebar-close" data-console-nav-close aria-label="Close navigation">
+                    <x-ui.icon name="x" :size="18" />
+                </button>
             </div>
 
             <nav class="console-sidebar-nav" aria-label="{{ ucfirst($context) }} navigation">
@@ -43,6 +50,10 @@
         <div class="console-main">
             <header class="console-topbar">
                 <div class="cluster-2">
+                    <button type="button" class="console-nav-toggle" data-console-nav-open aria-label="Open navigation">
+                        <x-ui.icon name="menu" :size="18" />
+                    </button>
+
                     @isset($topbar)
                         {{ $topbar }}
                     @endisset

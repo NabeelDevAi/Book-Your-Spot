@@ -1,6 +1,6 @@
 @php
     $cheapest = $business->spots->sortBy('price_amount')->first();
-    $cover = $business->images->first();
+    $cover = $business->images->firstWhere('media_type', 'image');
     $windows = $availability[$business->id] ?? [];
     $spotCount = $business->spots->count();
 @endphp

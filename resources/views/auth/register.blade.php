@@ -31,6 +31,7 @@
                     <span class="role-option-title">List my venue</span>
                     <span class="role-option-text">
                         Publish your tables, courts or rooms and take bookings.
+                        An admin reviews and approves every new Owner account first.
                     </span>
                 </label>
             </div>

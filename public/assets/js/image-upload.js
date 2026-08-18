@@ -1,10 +1,14 @@
 /*
  |----------------------------------------------------------------------
- | Image upload
+ | Image & video upload
  |----------------------------------------------------------------------
  | Client-side previews and a remaining-slots counter. The cap and the file
  | validation are enforced server-side; this only stops the owner picking
- | eight photos and finding out after the upload that three were dropped.
+ | eight files and finding out after the upload that three were dropped.
+ |
+ | The same dropzone markup serves both kinds -- data-upload-kind="video"
+ | switches the preview from <img> to a muted, non-autoplaying <video> so a
+ | walkthrough clip gets a thumbnail-scrubber instead of a broken image icon.
  */
 
 function formatSize(bytes) {
@@ -19,6 +23,7 @@ function render(root) {
     const counter = root.querySelector('[data-upload-counter]');
     const remaining = parseInt(root.dataset.uploadRemaining, 10);
     const maxKb = parseInt(root.dataset.uploadMaxKb, 10);
+    const isVideo = root.dataset.uploadKind === 'video';
 
     previews.innerHTML = '';
 
@@ -31,17 +36,26 @@ function render(root) {
         const item = document.createElement('div');
         item.className = 'upload-preview';
 
-        const img = document.createElement('img');
-        img.src = URL.createObjectURL(file);
+        const media = document.createElement(isVideo ? 'video' : 'img');
+        media.src = URL.createObjectURL(file);
         // Revoke once the browser has decoded it, or every re-render leaks a blob.
-        img.onload = () => URL.revokeObjectURL(img.src);
-        img.alt = '';
+        const revoke = () => URL.revokeObjectURL(media.src);
+
+        if (isVideo) {
+            media.muted = true;
+            media.playsInline = true;
+            media.preload = 'metadata';
+            media.onloadeddata = revoke;
+        } else {
+            media.alt = '';
+            media.onload = revoke;
+        }
 
         const meta = document.createElement('span');
         meta.className = 'upload-preview-meta';
         meta.textContent = formatSize(file.size);
 
-        item.append(img, meta);
+        item.append(media, meta);
 
         if (file.size / 1024 > maxKb) {
             item.classList.add('is-invalid');

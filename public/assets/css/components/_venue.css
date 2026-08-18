@@ -396,10 +396,12 @@
     grid-row: span 2;
 }
 
-.venue-gallery img {
+.venue-gallery img,
+.venue-gallery video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    background-color: var(--surface-sunken);
 }
 
 .venue-gallery-empty {

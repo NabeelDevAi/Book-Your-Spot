@@ -9,6 +9,7 @@
 import { initDropdowns } from './dropdown.js';
 import { initModals, initConfirmations } from './modal.js';
 import { initAlerts } from './alerts.js';
+import { initConsoleNav } from './console-nav.js';
 import { initHoursEditor } from './hours-editor.js';
 import { initImageUpload } from './image-upload.js';
 import { initBookingForm } from './booking-form.js';
@@ -30,6 +31,7 @@ function boot() {
     initModals();
     initConfirmations();
     initAlerts();
+    initConsoleNav();
     initHoursEditor();
     initImageUpload();
     // Before initBookingForm(): the segmented control has to be listening
