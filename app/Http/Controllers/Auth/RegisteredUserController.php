@@ -22,8 +22,12 @@ class RegisteredUserController extends Controller
     /**
      * FR-1.1 / FR-1.2: two registration tracks behind one form.
      *
-     * A Customer can book immediately. An Owner lands on their console and is
-     * prompted to create a Business, which then enters `pending_review`.
+     * A Customer can book immediately. An Owner is gated behind Admin approval
+     * (the amendment agreed with the product owner): the account is created as
+     * `pending_approval` and cannot log in (LoginRequest) until an Admin
+     * reviews it -- so it is deliberately NOT auto-logged-in here. A Business
+     * still separately enters `pending_review` once the (now-approved) Owner
+     * creates one; approving the account is not approving a venue.
      *
      * Note there is no verification gate: V1 delivers no email or SMS, so
      * FR-1.4 is waived. The `email_verified_at` column is still stamped so the
@@ -42,21 +46,25 @@ class RegisteredUserController extends Controller
         ]);
 
         $user->forceFill([
-            'status' => UserStatus::Active,
+            'status' => $role === UserRole::Owner ? UserStatus::PendingApproval : UserStatus::Active,
             'email_verified_at' => now(),
         ])->save();
 
         event(new Registered($user));
 
+        if ($role === UserRole::Owner) {
+            return redirect()->route('login')->with(
+                'success',
+                'Registration received. An admin will review your account shortly -- '
+                .'you can log in once it\'s approved.'
+            );
+        }
+
         Auth::login($user);
 
         $request->session()->regenerate();
 
-        return redirect()->route($role->homeRoute())->with(
-            'success',
-            $role === UserRole::Owner
-                ? 'Welcome to Venu365. Add your venue to get listed.'
-                : 'Welcome to Venu365. Find a spot and send your first request.'
-        );
+        return redirect()->route($role->homeRoute())
+            ->with('success', 'Welcome to Venu365. Find a spot and send your first request.');
     }
 }

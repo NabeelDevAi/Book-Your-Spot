@@ -60,7 +60,10 @@ Then:
 php artisan migrate --force
 php artisan db:seed --class=GameSeeder    # master category list (FR-2.3)
 php artisan db:seed --class=AdminSeeder   # creates the first admin
-php artisan storage:link
+# No storage:link step: uploaded media is written straight into public/uploads
+# (config/filesystems.php), not the storage/app/public symlink Laravel
+# defaults to -- chosen because the target host does not reliably support
+# symlinks. Just make sure public/uploads is writable by the web server user.
 
 php artisan config:cache
 php artisan route:cache
@@ -216,8 +219,8 @@ mysql -e "SELECT COUNT(*) FROM bys_restore_test.reservations"
 mysql -e "DROP DATABASE bys_restore_test"
 ```
 
-Venue photos in `storage/app/public` are **not** in the database dump — back
-that directory up separately.
+Venue photos and videos in `public/uploads` are **not** in the database dump —
+back that directory up separately.
 
 ---
 
@@ -277,7 +280,7 @@ Symptoms worth recognising:
 | Requests never expire; owners see a growing pending list | `schedule:run` cron missing |
 | Nobody receives notifications | queue worker stopped |
 | "Venue is not visible in search" despite approval | no **active** spot (SRS 9.17) |
-| Images 404 | `storage:link` not run, or wrong permissions |
+| Images 404 | `public/uploads` missing or not writable by the web server |
 | Times off by hours | `APP_TIMEZONE` not `Asia/Karachi` |
 
 ---

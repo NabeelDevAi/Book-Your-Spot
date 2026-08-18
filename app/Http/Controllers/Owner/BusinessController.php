@@ -54,7 +54,7 @@ class BusinessController extends Controller
         $this->authorize('create', Business::class);
 
         $business = DB::transaction(function () use ($request) {
-            $business = new Business($request->safe()->except(['operating_hours', 'images']));
+            $business = new Business($request->safe()->except(['operating_hours', 'images', 'videos']));
             $business->owner_id = $request->user()->id;
             $business->operating_hours = OperatingHours::fromFormInput($request->input('operating_hours'));
             $business->status = BusinessStatus::PendingReview;
@@ -66,6 +66,15 @@ class BusinessController extends Controller
                     $request->file('images'),
                     "businesses/{$business->id}",
                     (int) config('booking.max_business_images'),
+                );
+            }
+
+            if ($request->hasFile('videos')) {
+                $this->images->storeVideos(
+                    $business->images(),
+                    $request->file('videos'),
+                    "businesses/{$business->id}",
+                    (int) config('booking.max_business_videos'),
                 );
             }
 
@@ -97,7 +106,7 @@ class BusinessController extends Controller
         $this->authorize('update', $business);
 
         DB::transaction(function () use ($request, $business) {
-            $business->fill($request->safe()->except(['operating_hours', 'images']));
+            $business->fill($request->safe()->except(['operating_hours', 'images', 'videos']));
             $business->operating_hours = OperatingHours::fromFormInput($request->input('operating_hours'));
 
             // Editing an already-rejected venue is how an Owner resubmits it,
@@ -116,6 +125,15 @@ class BusinessController extends Controller
                     $request->file('images'),
                     "businesses/{$business->id}",
                     (int) config('booking.max_business_images'),
+                );
+            }
+
+            if ($request->hasFile('videos')) {
+                $this->images->storeVideos(
+                    $business->images(),
+                    $request->file('videos'),
+                    "businesses/{$business->id}",
+                    (int) config('booking.max_business_videos'),
                 );
             }
 

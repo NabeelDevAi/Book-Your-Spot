@@ -38,10 +38,16 @@ return [
             'report' => false,
         ],
 
+        // Owner/spot photos and videos. Deliberately a real folder inside
+        // public/ rather than storage/app/public behind the usual symlink:
+        // the target host does not reliably support symlinks (some shared
+        // hosting blocks them or wipes storage/ on deploy), so a file
+        // written here is served directly with nothing extra to set up
+        // after a deploy -- no `storage:link` step that can be forgotten.
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('app/public'),
-            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/storage',
+            'root' => public_path('uploads'),
+            'url' => rtrim(env('APP_URL', 'http://localhost'), '/').'/uploads',
             'visibility' => 'public',
             'throw' => false,
             'report' => false,
@@ -67,14 +73,12 @@ return [
     | Symbolic Links
     |--------------------------------------------------------------------------
     |
-    | Here you may configure the symbolic links that will be created when the
-    | `storage:link` Artisan command is executed. The array keys should be
-    | the locations of the links and the values should be their targets.
+    | Empty on purpose: the 'public' disk above writes directly into public/
+    | now, so there is no symlink for `storage:link` to create or for a
+    | symlink-unfriendly host to break.
     |
     */
 
-    'links' => [
-        public_path('storage') => storage_path('app/public'),
-    ],
+    'links' => [],
 
 ];

@@ -66,7 +66,7 @@ class SpotController extends Controller
             ->firstOrFail();
 
         DB::transaction(function () use ($request, $business, $businessGame) {
-            $spot = new Spot($request->safe()->except(['operating_hours', 'images', 'override_hours']));
+            $spot = new Spot($request->safe()->except(['operating_hours', 'images', 'videos', 'override_hours']));
             $spot->business_game_id = $businessGame->id;
             $spot->business_id = $business->id;
             $spot->status = SpotStatus::Active;
@@ -80,6 +80,15 @@ class SpotController extends Controller
                     $request->file('images'),
                     "spots/{$spot->id}",
                     (int) config('booking.max_spot_images'),
+                );
+            }
+
+            if ($request->hasFile('videos')) {
+                $this->images->storeVideos(
+                    $spot->images(),
+                    $request->file('videos'),
+                    "spots/{$spot->id}",
+                    (int) config('booking.max_spot_videos'),
                 );
             }
         });
@@ -114,7 +123,7 @@ class SpotController extends Controller
         abort_unless($spot->business_id === $business->id, 404);
 
         DB::transaction(function () use ($request, $spot) {
-            $spot->fill($request->safe()->except(['operating_hours', 'images', 'override_hours']));
+            $spot->fill($request->safe()->except(['operating_hours', 'images', 'videos', 'override_hours']));
             $spot->operating_hours_override = $this->resolveOverride($request);
             $spot->save();
 
@@ -124,6 +133,15 @@ class SpotController extends Controller
                     $request->file('images'),
                     "spots/{$spot->id}",
                     (int) config('booking.max_spot_images'),
+                );
+            }
+
+            if ($request->hasFile('videos')) {
+                $this->images->storeVideos(
+                    $spot->images(),
+                    $request->file('videos'),
+                    "spots/{$spot->id}",
+                    (int) config('booking.max_spot_videos'),
                 );
             }
         });

@@ -35,7 +35,7 @@ class BookingValidator
     {
         $this->assertUserMayBook($user);
         $this->assertSpotIsBookable($spot);
-        $this->assertDurationIsValid($spot, $durationMinutes);
+        $this->assertDurationIsValid($spot, $durationMinutes, $start);
 
         $end = $start->copy()->addMinutes($durationMinutes);
 
@@ -62,7 +62,7 @@ class BookingValidator
     public function validateManual(Spot $spot, Carbon $start, int $durationMinutes): void
     {
         $this->assertSpotIsBookable($spot);
-        $this->assertDurationIsValid($spot, $durationMinutes);
+        $this->assertDurationIsValid($spot, $durationMinutes, $start);
 
         $end = $start->copy()->addMinutes($durationMinutes);
 
@@ -117,28 +117,23 @@ class BookingValidator
     }
 
     /**
-     * SRS 9.7 -- within the spot's bounds AND an exact multiple of the billing
-     * unit. The error carries valid alternatives, because "invalid duration" on
-     * its own leaves the customer guessing.
+     * SRS amendment -- only a minimum, an exact multiple of the billing unit.
+     * There is no owner-set maximum any more; assertWithinOperatingHours()
+     * below is what actually stops a booking too long to fit in the day. The
+     * error carries valid alternatives for that day, because "invalid
+     * duration" on its own leaves the customer guessing.
      */
-    private function assertDurationIsValid(Spot $spot, int $durationMinutes): void
+    private function assertDurationIsValid(Spot $spot, int $durationMinutes, Carbon $start): void
     {
         if ($spot->isValidDuration($durationMinutes)) {
             return;
         }
 
-        $allowed = $spot->allowedDurations();
+        $allowed = $spot->allowedDurations($start);
 
         if ($durationMinutes < $spot->min_duration_minutes) {
             throw BookingException::invalidDuration(
                 'The shortest booking here is '.Money::duration($spot->min_duration_minutes).'.',
-                $allowed,
-            );
-        }
-
-        if ($durationMinutes > $spot->max_duration_minutes) {
-            throw BookingException::invalidDuration(
-                'The longest booking here is '.Money::duration($spot->max_duration_minutes).'.',
                 $allowed,
             );
         }

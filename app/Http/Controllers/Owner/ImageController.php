@@ -19,9 +19,10 @@ class ImageController extends Controller
         $this->authorize('update', $business);
         abort_unless($image->business_id === $business->id, 404);
 
+        $isVideo = $image->isVideo();
         $this->images->delete($image);
 
-        return back()->with('success', 'Photo removed.');
+        return back()->with('success', $isVideo ? 'Video removed.' : 'Photo removed.');
     }
 
     public function destroySpotImage(Business $business, Spot $spot, SpotImage $image): RedirectResponse
@@ -29,8 +30,9 @@ class ImageController extends Controller
         $this->authorize('update', $spot);
         abort_unless($spot->business_id === $business->id && $image->spot_id === $spot->id, 404);
 
+        $isVideo = $image->isVideo();
         $this->images->delete($image);
 
-        return back()->with('success', 'Photo removed.');
+        return back()->with('success', $isVideo ? 'Video removed.' : 'Photo removed.');
     }
 }

@@ -34,7 +34,7 @@ class SearchController extends Controller
             'max_price' => ['nullable', 'numeric', 'min:0'],
             'date' => ['nullable', 'date', 'after_or_equal:today'],
             'time' => ['nullable', 'date_format:H:i'],
-            'duration' => ['nullable', 'integer', 'min:10', 'max:'.config('booking.max_duration_minutes')],
+            'duration' => ['nullable', 'integer', 'min:10', 'max:'.config('booking.duration_input_ceiling_minutes')],
         ]);
 
         $businesses = $this->search->results($filters);

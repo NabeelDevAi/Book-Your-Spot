@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Enums\UserStatus;
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -50,25 +52,35 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        // Reject a suspended account here rather than letting it log in and be
-        // bounced by middleware on the next request. Doing it at the door means
-        // the user gets a real explanation instead of a session that mysteriously
-        // dies, and no suspended session is ever created in the first place.
+        // Reject a suspended/pending/rejected account here rather than letting
+        // it log in and be bounced by middleware on the next request. Doing it
+        // at the door means the user gets a real explanation instead of a
+        // session that mysteriously dies, and no such session is ever created.
         $user = Auth::user();
 
         if (! $user->isActive()) {
-            $reason = $user->suspension_reason;
-
             Auth::guard('web')->logout();
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trim('This account has been suspended. '
-                    .($reason ? "Reason: {$reason}" : 'Please contact support.')),
+                'email' => $this->inactiveMessage($user),
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
+    }
+
+    /** One explanation per reason an account can't log in right now. */
+    private function inactiveMessage(User $user): string
+    {
+        return match ($user->status) {
+            UserStatus::PendingApproval => 'Your account is awaiting admin approval. '
+                .'We\'ll let you know once it\'s reviewed.',
+            UserStatus::Rejected => trim('Your account registration wasn\'t approved. '
+                .($user->rejection_reason ? "Reason: {$user->rejection_reason}" : 'Please contact support.')),
+            default => trim('This account has been suspended. '
+                .($user->suspension_reason ? "Reason: {$user->suspension_reason}" : 'Please contact support.')),
+        };
     }
 
     /**

@@ -148,13 +148,11 @@ class BusinessSearch
 
     private function spotHasAvailability(Spot $spot, Carbon $date, ?string $time, int $duration): bool
     {
-        // Respect the spot's own bounds -- a 60-minute request against a court
+        // Respect the spot's own minimum -- a 60-minute request against a court
         // with a 90-minute minimum is not availability, it is a dead end.
+        // There is no maximum to check: a duration too long for the day simply
+        // yields no start times below.
         $effectiveDuration = max($duration, $spot->min_duration_minutes);
-
-        if ($effectiveDuration > $spot->max_duration_minutes) {
-            return false;
-        }
 
         $starts = $this->availability->startTimesFor($spot, $date, $effectiveDuration);
 

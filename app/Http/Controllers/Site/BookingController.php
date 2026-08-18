@@ -38,7 +38,7 @@ class BookingController extends Controller
         abort_unless($spot->isBookable(), 404);
 
         $date = $this->resolveDate($request->query('date'));
-        $duration = $this->resolveDuration($spot, $request->query('duration'));
+        $duration = $this->resolveDuration($spot, $date, $request->query('duration'));
 
         return view('site.book', [
             'spot' => $spot,
@@ -46,9 +46,9 @@ class BookingController extends Controller
             'duration' => $duration,
             'startTimes' => $this->availability->startTimesFor($spot, $date, $duration),
             'freeWindows' => $this->availability->freeWindows($spot, $date),
-            'durations' => $spot->allowedDurations(),
-            'priceExplanation' => $this->pricing->explain($spot, $duration),
-            'total' => $this->pricing->total($spot, $duration),
+            'durations' => $spot->allowedDurations($date),
+            'priceExplanation' => $this->pricing->explain($spot, $date, $duration),
+            'total' => $this->pricing->total($spot, $date, $duration),
             'dateOptions' => $this->dateOptions(),
         ]);
     }
@@ -70,13 +70,13 @@ class BookingController extends Controller
         ]);
 
         $date = $this->resolveDate($validated['date']);
-        $duration = $this->resolveDuration($spot, $validated['duration']);
+        $duration = $this->resolveDuration($spot, $date, $validated['duration']);
 
         return response()->json([
             'duration' => $duration,
-            'total' => $this->pricing->total($spot, $duration),
-            'total_label' => \App\Support\Money::pkr($this->pricing->total($spot, $duration)),
-            'explanation' => $this->pricing->explain($spot, $duration),
+            'total' => $this->pricing->total($spot, $date, $duration),
+            'total_label' => \App\Support\Money::pkr($this->pricing->total($spot, $date, $duration)),
+            'explanation' => $this->pricing->explain($spot, $date, $duration),
             'slots' => array_map(
                 fn (Carbon $start) => [
                     'value' => $start->format('Y-m-d H:i'),
@@ -154,9 +154,9 @@ class BookingController extends Controller
     }
 
     /** Snap an arbitrary query value onto a duration this spot actually sells. */
-    private function resolveDuration(Spot $spot, mixed $input): int
+    private function resolveDuration(Spot $spot, Carbon $date, mixed $input): int
     {
-        $allowed = $spot->allowedDurations();
+        $allowed = $spot->allowedDurations($date);
         $requested = (int) $input;
 
         if (in_array($requested, $allowed, true)) {

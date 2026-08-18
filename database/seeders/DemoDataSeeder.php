@@ -9,6 +9,7 @@ use App\Enums\UserRole;
 use App\Models\Business;
 use App\Models\BusinessGame;
 use App\Models\Game;
+use App\Models\Holiday;
 use App\Models\Reservation;
 use App\Models\ReservationConflict;
 use App\Models\Spot;
@@ -46,6 +47,14 @@ class DemoDataSeeder extends Seeder
 
         $this->createReservations($cueConsole, $turfArena, $customers);
         $this->createBlocksAndConflicts($cueConsole, $customers);
+        $this->createHolidays();
+    }
+
+    /** A couple of Pakistan public holidays, so the weekend-pricing amendment has something to show. */
+    private function createHolidays(): void
+    {
+        Holiday::updateOrCreate(['date' => '2026-08-14'], ['name' => 'Independence Day']);
+        Holiday::updateOrCreate(['date' => '2026-12-25'], ['name' => 'Quaid-e-Azam Day']);
     }
 
     /** @return array<string, User> */
@@ -177,7 +186,6 @@ class DemoDataSeeder extends Seeder
                 'price_amount' => 1200,
                 'price_unit_minutes' => 30,
                 'min_duration_minutes' => 30,
-                'max_duration_minutes' => 120,
                 'sort_order' => $n,
             ]);
         }
@@ -203,6 +211,10 @@ class DemoDataSeeder extends Seeder
                 'business_game_id' => $padel->id,
                 'business_id' => $business->id,
                 'sort_order' => $n,
+                // Weekday/weekend pricing showcase: Rs 4,000 on Sat/Sun and
+                // public holidays, Rs 2,500 the rest of the week (via
+                // padel()'s base price_amount).
+                'weekend_price_amount' => 4000,
             ]);
         }
 
@@ -235,7 +247,6 @@ class DemoDataSeeder extends Seeder
                 'price_amount' => 800,
                 'price_unit_minutes' => 30,
                 'min_duration_minutes' => 30,
-                'max_duration_minutes' => 120,
                 'sort_order' => $n,
             ]);
         }
@@ -274,7 +285,6 @@ class DemoDataSeeder extends Seeder
             'price_amount' => 350,
             'price_unit_minutes' => 30,
             'min_duration_minutes' => 60,
-            'max_duration_minutes' => 180,
         ]);
     }
 

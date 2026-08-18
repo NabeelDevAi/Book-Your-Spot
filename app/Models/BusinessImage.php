@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['business_id', 'path', 'caption', 'sort_order'])]
+/** A photo OR a short video clip -- see media_type. Same table for both (ImageManager). */
+#[Fillable(['business_id', 'path', 'media_type', 'caption', 'sort_order'])]
 class BusinessImage extends Model
 {
     use HasFactory;
@@ -26,5 +27,10 @@ class BusinessImage extends Model
     public function url(): string
     {
         return Storage::disk('public')->url($this->path);
+    }
+
+    public function isVideo(): bool
+    {
+        return $this->media_type === 'video';
     }
 }

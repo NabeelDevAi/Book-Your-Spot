@@ -21,6 +21,10 @@ class AuditLogger
 
     public const USER_REINSTATED = 'user.reinstated';
 
+    public const OWNER_ACCOUNT_APPROVED = 'owner_account.approved';
+
+    public const OWNER_ACCOUNT_REJECTED = 'owner_account.rejected';
+
     public const PASSWORD_RESET_ISSUED = 'user.password_reset_issued';
 
     public const PASSWORD_RESET_REQUESTED = 'user.password_reset_requested';

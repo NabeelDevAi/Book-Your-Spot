@@ -9,11 +9,16 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 /**
- * FR-2.4 -- a bookable unit's pricing, duration bounds and optional hours override.
+ * FR-2.4 -- a bookable unit's pricing, duration bound and optional hours override.
  *
  * The cross-field rules here are what make SRS 9.7 enforceable later: if a Spot
  * is allowed to exist with a 25-minute minimum on a 10-minute billing unit, no
  * amount of validation at booking time can give the customer a sensible answer.
+ *
+ * There is deliberately no maximum-duration field (SRS amendment): how long a
+ * Spot can be booked for is bounded only by how much of a day's operating
+ * hours are free, which BookingValidator enforces at booking time -- not
+ * something an Owner configures here.
  */
 class SpotRequest extends FormRequest
 {
@@ -29,13 +34,16 @@ class SpotRequest extends FormRequest
             'description' => ['nullable', 'string', 'max:1000'],
 
             'price_amount' => ['required', 'numeric', 'min:1', 'max:1000000'],
+            // Nullable: absent (or equal to the weekday rate) means "no
+            // separate weekend rate", the same "null means inherit" shape as
+            // operating_hours_override.
+            'weekend_price_amount' => ['nullable', 'numeric', 'min:1', 'max:1000000'],
             'price_unit_minutes' => [
                 'required', 'integer',
                 Rule::in(config('booking.allowed_price_unit_minutes')),
             ],
 
-            'min_duration_minutes' => ['required', 'integer', 'min:1', 'max:'.config('booking.max_duration_minutes')],
-            'max_duration_minutes' => ['required', 'integer', 'min:1', 'max:'.config('booking.max_duration_minutes')],
+            'min_duration_minutes' => ['required', 'integer', 'min:1', 'max:'.config('booking.duration_input_ceiling_minutes')],
 
             // Nullable: absent means "inherit the venue's hours", which is
             // deliberately different from an all-week-closed override.
@@ -48,6 +56,13 @@ class SpotRequest extends FormRequest
                 'mimes:jpg,jpeg,png,webp',
                 'max:'.config('booking.max_image_kilobytes'),
             ],
+
+            'videos' => ['nullable', 'array', 'max:'.config('booking.max_spot_videos')],
+            'videos.*' => [
+                'file',
+                'mimes:'.implode(',', config('booking.allowed_video_mimes')),
+                'max:'.config('booking.max_video_kilobytes'),
+            ],
         ];
     }
 
@@ -56,34 +71,18 @@ class SpotRequest extends FormRequest
         $validator->after(function (Validator $validator) {
             $unit = (int) $this->input('price_unit_minutes');
             $min = (int) $this->input('min_duration_minutes');
-            $max = (int) $this->input('max_duration_minutes');
 
-            if ($unit <= 0 || $min <= 0 || $max <= 0) {
+            if ($unit <= 0 || $min <= 0) {
                 return;
             }
 
-            if ($max < $min) {
-                $validator->errors()->add(
-                    'max_duration_minutes',
-                    'The maximum booking length must be at least the minimum.'
-                );
-            }
-
-            // Both bounds must be whole billing units, or the Spot advertises
-            // durations it cannot actually price.
+            // Must be a whole billing unit, or the Spot advertises a minimum
+            // it cannot actually price.
             if ($min % $unit !== 0) {
                 $validator->errors()->add(
                     'min_duration_minutes',
                     'The minimum must be a multiple of '.Money::duration($unit)
                     .'. Try '.(int) (ceil($min / $unit) * $unit).' minutes.'
-                );
-            }
-
-            if ($max % $unit !== 0) {
-                $validator->errors()->add(
-                    'max_duration_minutes',
-                    'The maximum must be a multiple of '.Money::duration($unit)
-                    .'. Try '.(int) (floor($max / $unit) * $unit).' minutes.'
                 );
             }
         });
@@ -92,10 +91,10 @@ class SpotRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'price_amount' => 'price',
+            'price_amount' => 'weekday price',
+            'weekend_price_amount' => 'weekend price',
             'price_unit_minutes' => 'billing unit',
             'min_duration_minutes' => 'minimum booking length',
-            'max_duration_minutes' => 'maximum booking length',
             'operating_hours' => 'opening hours',
         ];
     }

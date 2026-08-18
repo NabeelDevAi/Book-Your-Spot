@@ -5,8 +5,10 @@ namespace App\Models;
 use App\Casts\OperatingHoursCast;
 use App\Enums\ReservationStatus;
 use App\Enums\SpotStatus;
+use App\Services\Booking\HolidayCalendar;
 use App\Support\Money;
 use App\Support\OperatingHours;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -19,8 +21,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * The physical bookable unit -- a table, court or room. Reservations attach here.
  */
 #[Fillable([
-    'name', 'description', 'price_amount', 'price_unit_minutes',
-    'min_duration_minutes', 'max_duration_minutes', 'status',
+    'name', 'description', 'price_amount', 'weekend_price_amount', 'price_unit_minutes',
+    'min_duration_minutes', 'status',
     'operating_hours_override', 'sort_order',
 ])]
 class Spot extends Model
@@ -32,9 +34,9 @@ class Spot extends Model
         return [
             'status' => SpotStatus::class,
             'price_amount' => 'decimal:2',
+            'weekend_price_amount' => 'decimal:2',
             'price_unit_minutes' => 'integer',
             'min_duration_minutes' => 'integer',
-            'max_duration_minutes' => 'integer',
             'sort_order' => 'integer',
             'operating_hours_override' => OperatingHoursCast::class,
         ];
@@ -92,45 +94,92 @@ class Spot extends Model
         return $this->operating_hours_override !== null;
     }
 
-    /** Price for a duration, rounded up to whole billing units. */
-    public function priceFor(int $durationMinutes): float
+    /**
+     * Whether $date bills at the weekend rate: a weekend day, a listed
+     * Holiday, or the day immediately before one (see HolidayCalendar).
+     */
+    public function isWeekendRateDay(CarbonInterface $date): bool
+    {
+        return app(HolidayCalendar::class)->isWeekendRate($date);
+    }
+
+    /** The rate that applies on $date -- weekday or weekend. */
+    public function rateFor(CarbonInterface $date): float
+    {
+        if ($this->isWeekendRateDay($date) && $this->weekend_price_amount !== null) {
+            return (float) $this->weekend_price_amount;
+        }
+
+        return (float) $this->price_amount;
+    }
+
+    /** Whether a weekend rate has actually been set differently from the weekday one. */
+    public function hasDistinctWeekendRate(): bool
+    {
+        return $this->weekend_price_amount !== null
+            && (float) $this->weekend_price_amount !== (float) $this->price_amount;
+    }
+
+    /** Price for a duration on a given date, rounded up to whole billing units. */
+    public function priceFor(CarbonInterface $date, int $durationMinutes): float
     {
         $units = (int) ceil($durationMinutes / $this->price_unit_minutes);
 
-        return round($units * (float) $this->price_amount, 2);
+        return round($units * $this->rateFor($date), 2);
     }
 
     public function rateLabel(): string
     {
-        return Money::rate($this->price_amount, $this->price_unit_minutes);
+        $weekday = Money::rate($this->price_amount, $this->price_unit_minutes);
+
+        if (! $this->hasDistinctWeekendRate()) {
+            return $weekday;
+        }
+
+        return $weekday.' weekdays · '.Money::rate($this->weekend_price_amount, $this->price_unit_minutes).' weekends';
     }
 
     /**
-     * Durations a User may pick: every multiple of the billing unit between the
-     * min and max. Drives the booking form's duration options and the "valid
-     * durations" hint on a SRS 9.7 validation failure.
+     * Durations a User may pick: every multiple of the billing unit, from the
+     * minimum up to how long the longest single open window that day runs.
+     *
+     * There is no owner-set maximum (SRS amendment: minimum only) -- the real
+     * ceiling is simply how much of the day is open at all. Without a date,
+     * the longest window across the whole week is used as a generic bound
+     * (error messages, listings that aren't tied to one day).
      *
      * @return list<int>
      */
-    public function allowedDurations(): array
+    public function allowedDurations(?CarbonInterface $date = null): array
     {
-        $durations = [];
         $unit = $this->price_unit_minutes;
 
         // Start at the first multiple of the unit that reaches the minimum, so
         // a min of 25 on a 10-minute table yields 30, not 25.
         $start = (int) (ceil($this->min_duration_minutes / $unit) * $unit);
 
-        for ($minutes = $start; $minutes <= $this->max_duration_minutes; $minutes += $unit) {
+        $ceiling = $date !== null
+            ? $this->effectiveHours()->longestRangeMinutes(strtolower($date->format('D')))
+            : $this->effectiveHours()->longestRangeMinutes();
+
+        if ($ceiling < $start) {
+            return [];
+        }
+
+        $end = (int) (floor($ceiling / $unit) * $unit);
+        $durations = [];
+
+        for ($minutes = $start; $minutes <= $end; $minutes += $unit) {
             $durations[] = $minutes;
         }
 
         return $durations;
     }
 
+    /** SRS amendment: only a minimum is enforced, on a billing-unit boundary. */
     public function isValidDuration(int $minutes): bool
     {
-        return in_array($minutes, $this->allowedDurations(), true);
+        return $minutes >= $this->min_duration_minutes && $minutes % $this->price_unit_minutes === 0;
     }
 
     /*

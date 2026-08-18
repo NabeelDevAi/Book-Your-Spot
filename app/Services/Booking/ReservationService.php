@@ -65,7 +65,7 @@ class ReservationService
 
             // Price is snapshotted now so a later change to the Spot cannot
             // rewrite what this customer agreed to (SRS 9.10).
-            $reservation->forceFill($this->pricing->snapshotFor($spot, $durationMinutes));
+            $reservation->forceFill($this->pricing->snapshotFor($spot, $start, $durationMinutes));
 
             $reservation->status = ReservationStatus::Pending;
             $reservation->requested_at = now();
@@ -139,7 +139,7 @@ class ReservationService
                 'channel' => $channel,
             ]);
 
-            $reservation->forceFill($this->pricing->snapshotFor($lockedSpot, $durationMinutes));
+            $reservation->forceFill($this->pricing->snapshotFor($lockedSpot, $start, $durationMinutes));
 
             $reservation->forceFill([
                 'status' => ReservationStatus::Confirmed,

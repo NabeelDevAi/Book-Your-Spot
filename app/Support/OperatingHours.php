@@ -152,6 +152,45 @@ final class OperatingHours
         return $this->forDay($day) === [];
     }
 
+    /**
+     * The longest single open range, in minutes -- across the whole week, or
+     * just one day when $day is given. An overnight range ("22:00"-"02:00")
+     * counts its full span across midnight.
+     *
+     * This is the "no maximum booking length, only minimum" ceiling: a
+     * booking can run as long as a single open window will hold it, so the
+     * UI needs to know how long that window actually is rather than an
+     * owner-set number (Spot::allowedDurations()).
+     */
+    public function longestRangeMinutes(?string $day = null): int
+    {
+        $days = $day !== null ? [strtolower($day)] : self::DAYS;
+        $longest = 0;
+
+        foreach ($days as $d) {
+            foreach ($this->forDay($d) as $range) {
+                $longest = max($longest, self::rangeMinutes($range['open'], $range['close']));
+            }
+        }
+
+        return $longest;
+    }
+
+    private static function rangeMinutes(string $open, string $close): int
+    {
+        [$openHour, $openMinute] = array_map('intval', explode(':', $open));
+        [$closeHour, $closeMinute] = array_map('intval', explode(':', $close));
+
+        $start = $openHour * 60 + $openMinute;
+        $end = $closeHour * 60 + $closeMinute;
+
+        if ($end <= $start) {
+            $end += 24 * 60;
+        }
+
+        return $end - $start;
+    }
+
     public function isClosedAllWeek(): bool
     {
         foreach (self::DAYS as $day) {

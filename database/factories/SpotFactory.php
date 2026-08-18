@@ -23,9 +23,9 @@ class SpotFactory extends Factory
             'name' => 'Table '.fake()->numberBetween(1, 12),
             'description' => null,
             'price_amount' => 100,
+            'weekend_price_amount' => null,
             'price_unit_minutes' => 10,
             'min_duration_minutes' => 30,
-            'max_duration_minutes' => 240,
             'status' => SpotStatus::Active,
             'operating_hours_override' => null,
             'sort_order' => 0,
@@ -40,7 +40,6 @@ class SpotFactory extends Factory
             'price_amount' => 100,
             'price_unit_minutes' => 10,
             'min_duration_minutes' => 30,
-            'max_duration_minutes' => 240,
         ]);
     }
 
@@ -52,7 +51,6 @@ class SpotFactory extends Factory
             'price_amount' => 2500,
             'price_unit_minutes' => 60,
             'min_duration_minutes' => 60,
-            'max_duration_minutes' => 180,
         ]);
     }
 
@@ -63,7 +61,6 @@ class SpotFactory extends Factory
             'price_amount' => 400,
             'price_unit_minutes' => 30,
             'min_duration_minutes' => 60,
-            'max_duration_minutes' => 240,
         ]);
     }
 
@@ -74,7 +71,6 @@ class SpotFactory extends Factory
             'price_amount' => 4000,
             'price_unit_minutes' => 60,
             'min_duration_minutes' => 60,
-            'max_duration_minutes' => 120,
         ]);
     }
 
@@ -91,11 +87,24 @@ class SpotFactory extends Factory
         ]);
     }
 
-    public function duration(int $min, int $max): static
+    /** A distinct Sat/Sun/holiday rate, separate from the weekday price_amount. */
+    public function weekendPricedAt(float $amount): static
     {
-        return $this->state(fn () => [
-            'min_duration_minutes' => $min,
-            'max_duration_minutes' => $max,
-        ]);
+        return $this->state(fn () => ['weekend_price_amount' => $amount]);
+    }
+
+    /**
+     * There is no maximum any more (SRS amendment) -- $max is accepted and
+     * ignored so existing call sites keep compiling; only the minimum lands
+     * on the model. New tests should call minDuration() instead.
+     */
+    public function duration(int $min, ?int $max = null): static
+    {
+        return $this->state(fn () => ['min_duration_minutes' => $min]);
+    }
+
+    public function minDuration(int $min): static
+    {
+        return $this->state(fn () => ['min_duration_minutes' => $min]);
     }
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\BusinessController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\GameController;
+use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\PasswordResetRequestController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReservationController;
@@ -44,6 +45,11 @@ Route::middleware(['auth', 'role:admin'])
             Route::post('clear-duplicate', [BusinessController::class, 'clearDuplicateFlag'])->name('clear-duplicate');
         });
 
+        // Pricing amendment -- the platform-wide holiday calendar.
+        Route::get('holidays', [HolidayController::class, 'index'])->name('holidays.index');
+        Route::post('holidays', [HolidayController::class, 'store'])->name('holidays.store');
+        Route::delete('holidays/{holiday}', [HolidayController::class, 'destroy'])->name('holidays.destroy');
+
         // FR-3.3 -- the master category list.
         Route::get('games', [GameController::class, 'index'])->name('games.index');
         Route::post('games', [GameController::class, 'store'])->name('games.store');
@@ -60,6 +66,10 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('users/{user}', [UserController::class, 'show'])->name('users.show');
         Route::post('users/{user}/suspend', [UserController::class, 'suspend'])->name('users.suspend');
         Route::post('users/{user}/reinstate', [UserController::class, 'reinstate'])->name('users.reinstate');
+
+        // Owner-account approval gate -- an Owner cannot log in until one of these fires.
+        Route::post('users/{user}/approve-owner', [UserController::class, 'approveOwner'])->name('users.approve-owner');
+        Route::post('users/{user}/reject-owner', [UserController::class, 'rejectOwner'])->name('users.reject-owner');
 
         // Stands in for the emailed reset link -- see the FR-1.5 amendment.
         Route::get('password-requests', [PasswordResetRequestController::class, 'index'])

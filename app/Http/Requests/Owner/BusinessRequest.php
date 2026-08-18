@@ -34,6 +34,13 @@ class BusinessRequest extends FormRequest
                 'mimes:jpg,jpeg,png,webp',
                 'max:'.config('booking.max_image_kilobytes'),
             ],
+
+            'videos' => ['nullable', 'array', 'max:'.config('booking.max_business_videos')],
+            'videos.*' => [
+                'file',
+                'mimes:'.implode(',', config('booking.allowed_video_mimes')),
+                'max:'.config('booking.max_video_kilobytes'),
+            ],
         ];
     }
 
@@ -44,6 +51,9 @@ class BusinessRequest extends FormRequest
             'images.max' => 'You can upload at most '.config('booking.max_business_images').' images.',
             'images.*.max' => 'Each image must be under '
                 .round(config('booking.max_image_kilobytes') / 1024).' MB.',
+            'videos.max' => 'You can upload at most '.config('booking.max_business_videos').' videos.',
+            'videos.*.max' => 'Each video must be under '
+                .round(config('booking.max_video_kilobytes') / 1024).' MB.',
         ];
     }
 

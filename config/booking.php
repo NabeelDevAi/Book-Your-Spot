@@ -90,17 +90,45 @@ return [
 
     'max_image_kilobytes' => 4096,
 
+    // Videos get their own cap, separate from the photo cap above -- a venue
+    // can carry its full 5 photos AND up to 2 walkthrough clips.
+    'max_business_videos' => 2,
+
+    'max_spot_videos' => 2,
+
+    'max_video_kilobytes' => 51200, // 50 MB
+
+    // Extensions for the `mimes:` validation rule, NOT MIME types -- .mov
+    // already covers QuickTime files, there is no ".quicktime" extension.
+    'allowed_video_mimes' => ['mp4', 'webm', 'mov'],
+
     /*
     |--------------------------------------------------------------------------
     | Spot pricing & duration guardrails
     |--------------------------------------------------------------------------
     | Bounds applied when an Owner defines a Spot, so nobody creates a table
-    | billed in 7-minute blocks or bookable for three days.
+    | billed in 7-minute blocks. There is deliberately no "maximum booking"
+    | concept any more -- how long a Spot can be booked for is bounded only by
+    | its minimum and by how much of that day's operating hours are free
+    | (BookingValidator + AvailabilityService). This ceiling exists purely as
+    | a sanity bound on raw minute inputs (the minimum-length field, the
+    | search filter) so nobody types in a nonsense number of minutes.
     */
 
     'allowed_price_unit_minutes' => [5, 10, 15, 20, 30, 45, 60, 90, 120],
 
-    'max_duration_minutes' => 720,
+    'duration_input_ceiling_minutes' => 1440,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Weekend & holiday pricing
+    |--------------------------------------------------------------------------
+    | A Spot bills its `weekend_price_amount` (falling back to the weekday
+    | `price_amount` when unset) on any date that is a weekend day, a listed
+    | Holiday, or the calendar day immediately before a listed Holiday.
+    */
+
+    'weekend_days' => [\Carbon\CarbonInterface::SATURDAY, \Carbon\CarbonInterface::SUNDAY],
 
     /*
     |--------------------------------------------------------------------------
