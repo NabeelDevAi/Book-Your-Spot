@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\PasswordResetRequestController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ReservationController;
+use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\Admin\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -81,4 +82,9 @@ Route::middleware(['auth', 'role:admin'])
 
         // NFR-6 / SRS 9.20 -- read-only moderation trail.
         Route::get('audit', [AuditLogController::class, 'index'])->name('audit.index');
+
+        // Web-reachable optimize/cache-clear -- no shell access on every deploy.
+        Route::get('system', [SystemController::class, 'index'])->name('system.index');
+        Route::post('system/optimize', [SystemController::class, 'optimize'])->name('system.optimize');
+        Route::post('system/clear-cache', [SystemController::class, 'clearCache'])->name('system.clear-cache');
     });

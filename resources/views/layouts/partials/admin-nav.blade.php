@@ -70,4 +70,9 @@
        class="sidebar-link {{ request()->routeIs('admin.audit.*') ? 'is-active' : '' }}">
         <x-ui.icon name="shield" :size="16" /> Audit log
     </a>
+
+    <a href="{{ route('admin.system.index') }}"
+       class="sidebar-link {{ request()->routeIs('admin.system.*') ? 'is-active' : '' }}">
+        <x-ui.icon name="settings" :size="16" /> System
+    </a>
 </div>
