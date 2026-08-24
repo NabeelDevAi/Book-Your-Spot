@@ -12,6 +12,8 @@
         </x-slot:breadcrumb>
     </x-ui.page-header>
 
+    <x-owner.venue-status-banner :business="$business" />
+
     {{-- FR-2.3: categories come from the Admin-managed master list. Owners
          can't invent their own, which is what stops the filter fragmenting
          into "PS5" / "Playstation 5" / "PS 5". --}}

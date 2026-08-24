@@ -9,6 +9,8 @@
         </x-slot:breadcrumb>
     </x-ui.page-header>
 
+    <x-owner.venue-status-banner :business="$business" />
+
     <form method="POST" action="{{ route('owner.businesses.spots.store', $business) }}" enctype="multipart/form-data">
         @csrf
 

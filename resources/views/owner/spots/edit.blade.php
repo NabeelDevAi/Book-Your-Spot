@@ -16,6 +16,8 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <x-owner.venue-status-banner :business="$business" />
+
     @if (! $spot->isActive())
         <x-ui.alert variant="warning" title="This spot is inactive" style="margin-bottom: var(--space-5);">
             Customers can't see or book it. Reactivate it from the spots list when it's back in service.

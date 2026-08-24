@@ -20,6 +20,8 @@
         </x-slot:actions>
     </x-ui.page-header>
 
+    <x-owner.venue-status-banner :business="$business" />
+
     @if ($businessGames->isEmpty())
         <x-ui.card>
             <x-ui.empty-state icon="layers" title="Choose a category first">
@@ -93,11 +95,15 @@
                                             </td>
                                             <td class="cell-actions">
                                                 <div class="btn-group">
-                                                    @if ($spot->isActive())
+                                                    @if ($spot->isActive() && $business->acceptsBookings())
                                                         <x-ui.button
                                                             :href="route('owner.businesses.spots.reservations.create', [$business, $spot])"
                                                             variant="secondary" size="sm" icon="plus"
                                                         >New booking</x-ui.button>
+                                                    @elseif ($spot->isActive())
+                                                        <span class="text-xs text-muted" title="Available once the venue is approved">
+                                                            New booking — pending approval
+                                                        </span>
                                                     @endif
 
                                                     <x-ui.button

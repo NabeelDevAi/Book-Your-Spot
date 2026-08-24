@@ -87,7 +87,8 @@ class BusinessController extends Controller
 
         return redirect()
             ->route('owner.businesses.games.edit', $business)
-            ->with('success', 'Venue saved. Now choose what people can book here.');
+            ->with('success', 'Venue saved and sent for approval. It\'s hidden from customers until then '
+                .'— go ahead and finish setting it up below, nothing here is blocked.');
     }
 
     public function edit(Business $business): View

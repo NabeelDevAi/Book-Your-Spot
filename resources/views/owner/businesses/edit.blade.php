@@ -16,20 +16,7 @@
         </x-slot:actions>
     </x-ui.page-header>
 
-    @if ($business->status === \App\Enums\BusinessStatus::Rejected)
-        <x-ui.alert variant="danger" title="This venue was rejected" style="margin-bottom: var(--space-5);">
-            {{ $business->rejection_reason }}
-            <br><strong>Fix the issue and save — it goes back into the review queue automatically.</strong>
-        </x-ui.alert>
-    @elseif ($business->isPendingReview())
-        <x-ui.alert variant="warning" title="Awaiting review" style="margin-bottom: var(--space-5);">
-            Customers can't see this venue yet. We'll let you know once it's approved.
-        </x-ui.alert>
-    @elseif ($business->isSuspended())
-        <x-ui.alert variant="danger" title="This venue is suspended" style="margin-bottom: var(--space-5);">
-            {{ $business->suspension_reason }}
-        </x-ui.alert>
-    @endif
+    <x-owner.venue-status-banner :business="$business" />
 
     <form method="POST" action="{{ route('owner.businesses.update', $business) }}" enctype="multipart/form-data">
         @csrf

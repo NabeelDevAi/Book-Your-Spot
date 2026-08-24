@@ -57,7 +57,10 @@
                             @elseif ($business->isSuspended())
                                 <p class="text-sm text-danger">Suspended: {{ $business->suspension_reason }}</p>
                             @elseif ($business->isPendingReview())
-                                <p class="text-sm text-warning">Awaiting approval — not visible to customers yet.</p>
+                                <p class="text-sm text-warning">
+                                    <strong>Awaiting approval</strong> — hidden from customers, but you can
+                                    keep setting up categories, spots and pricing in the meantime.
+                                </p>
                             @elseif ($business->spots_count === 0)
                                 {{-- SRS 9.17: approved but unbookable is invisible in search,
                                      which is confusing unless we say so. --}}

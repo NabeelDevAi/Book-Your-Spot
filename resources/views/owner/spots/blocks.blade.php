@@ -12,6 +12,8 @@
         </x-slot:breadcrumb>
     </x-ui.page-header>
 
+    <x-owner.venue-status-banner :business="$business" />
+
     {{-- SRS 9.14: owners can't book their own spots as customers, so this is
          the supported way to reserve your own table. --}}
     <x-ui.alert variant="info" style="margin-bottom: var(--space-5);">
